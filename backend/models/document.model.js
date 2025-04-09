@@ -11,7 +11,7 @@ const documentSchema = new mongoose.Schema({
     },
     items: [{   
       productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-      quantity: Number, // u paletama
+      quantity: Number, // u kg
       pricePerUnit: Number, // cena po kg
       vatRate: Number,
       total: Number // automatski izračunat
