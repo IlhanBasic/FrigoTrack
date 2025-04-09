@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 const partnerSchema = new mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
     name: { type: String, required: true },
     address: { type: String, required: true },
     email: { type: String,required:false},

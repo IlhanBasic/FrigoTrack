@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 const documentSchema = new mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
     type: { type: String, enum: ['otkup', 'prodaja', 'premestaj', 'otpis'], required: true },
     documentNumber: { type: String, unique: true }, // format: OTK-2023-001, PRO-2023-001
     date: { type: Date, default: Date.now },

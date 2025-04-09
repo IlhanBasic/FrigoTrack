@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 const coldRoomSchema = new mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
     roomNumber: { type: String, required: true, unique: true },
     location: { type: String }, // npr. "Objekat 1 - Hala A"
     temperature: { type: Number }, // npr. -18
