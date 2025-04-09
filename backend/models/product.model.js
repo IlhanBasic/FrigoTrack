@@ -49,7 +49,6 @@ const productSchema = new mongoose.Schema(
       brix: { type: Number },
       freezingMethod: { type: String, enum: ["IQF", "block"] },
     },
-    partner: { type: mongoose.Schema.Types.ObjectId, ref: "Partner" },
     expiryDate: Date,
     isActive: { type: Boolean, default: true },
     priceHistory: [

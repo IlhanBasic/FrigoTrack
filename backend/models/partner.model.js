@@ -6,7 +6,6 @@ const partnerSchema = new mongoose.Schema({
     phone: { type: String, required: true },
     pibOrJmbg: { type: String, required: true },
     isVATRegistered: { type: Boolean, default: false },
-    products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     isActive: { type: Boolean, default: true },
     type: { type: String, enum: ['poljoprivrednik', 'kupac'], required: true },
     bankDetails: {
