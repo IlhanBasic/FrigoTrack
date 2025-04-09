@@ -9,6 +9,7 @@ import productRoute from './routes/product.route.js';
 import documentRoute from './routes/document.route.js';
 import paymentRoute from './routes/payment.route.js';
 const app = express();
+dotenv.config({ path: '../.env' });
 app.use(cors());
 app.use(express.json());
 app.use('/api/users', userRoute);
@@ -17,7 +18,7 @@ app.use('/api/partners', partnerRoute);
 app.use('/api/products', productRoute);
 app.use('/api/documents', documentRoute);
 app.use('/api/payments', paymentRoute);
-app.listen(5000, () => {
+app.listen(process.env.PORT, () => {
     console.log('Server is running on port 5000');
     connectDB();
 });

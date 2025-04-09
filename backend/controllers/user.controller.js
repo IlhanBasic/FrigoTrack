@@ -10,21 +10,6 @@ const handleValidationErrors = (req, res) => {
     }
 };
 
-const verifyToken = (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-        return res.status(401).json({ message: 'Access denied, no token provided.' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // dodavanje korisničkih podataka u zahtev
-        next();
-    } catch (error) {
-        res.status(401).json({ message: 'Invalid or expired token.' });
-    }
-};
-
 export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find();
@@ -77,7 +62,7 @@ export const loginUser = async (req, res) => {
     if (!isMatch) {
         return res.status(400).json({ message: 'Invalid email or password.' });
     }
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(200).json({ token });
 };
 
