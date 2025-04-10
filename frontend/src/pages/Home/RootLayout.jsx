@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { authActions } from "../../store/auth-slice";
-import { toast } from "react-toastify";
+import BtnToTop from "../../components/BtnToTop";
 
 const api_url = import.meta.env.VITE_API_URL;
 
@@ -57,5 +57,10 @@ export default function RootLayout() {
     return null;
   }
 
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <BtnToTop />
+    </>
+  );
 }

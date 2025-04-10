@@ -57,12 +57,12 @@ export const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(400).json({ message: "Invalid username or password." });
+      return res.status(400).json({ message: "Korisničko ime ne postoji." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid username or password." });
+      return res.status(400).json({ message: "Šifra nije ispravna." });
     }
 
     const token = jwt.sign(

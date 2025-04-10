@@ -1,0 +1,46 @@
+:root {
+  --btn-color: rgb(40, 40, 202);
+  --btn-hover-color: rgb(30, 30, 168);
+  --btn-shadow: rgba(0, 0, 0, 0.2);
+  --btn-size: 60px;
+}
+
+.btn-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: var(--btn-color);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  color: white;
+  box-shadow: 0 4px 8px var(--btn-shadow);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  visibility: hidden;
+  z-index: 1000;
+  outline: none;
+}
+
+.btn-to-top:hover {
+  background-color: var(--btn-hover-color);
+  box-shadow: 0 8px 16px var(--btn-shadow);
+  transform: translateY(-5px);
+}
+
+.btn-to-top:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px var(--btn-shadow);
+}
+
+@media (max-width: 600px) {
+  .btn-to-top {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2em;
+  }
+}
