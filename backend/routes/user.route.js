@@ -5,10 +5,12 @@ import {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    getLoggedInUser
 } from '../controllers/user.controller.js';
 import {verifyAdmin,verifyToken} from '../middleware/auth.middleware.js';
 const router = express.Router();
+router.get('/me',getLoggedInUser);
 router.post('/register', createUser);
 router.post('/login', loginUser);
 router.get('/',verifyToken,verifyAdmin, getAllUsers);
