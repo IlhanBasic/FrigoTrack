@@ -10,11 +10,13 @@ import Partners from "./pages/Partners/Partners.jsx";
 import Payments from "./pages/Payments/Payments.jsx";
 import Rooms from "./pages/Rooms/Rooms.jsx";
 import Documents from "./pages/Documents/Documents.jsx";
+import Error from "./pages/Error/Error.jsx";
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
       element: <RootLayout />,
+      errorElement:<Error/>,
       children: [
         { index: true, element: <Home /> },
         { path: "/products", element: <Products /> },
