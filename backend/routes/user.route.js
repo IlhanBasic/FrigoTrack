@@ -6,15 +6,17 @@ import {
     getUserById,
     updateUser,
     deleteUser,
-    getLoggedInUser
+    getLoggedInUser,
+    deleteAllUser
 } from '../controllers/user.controller.js';
 import {verifyAdmin,verifyToken} from '../middleware/auth.middleware.js';
 const router = express.Router();
 router.get('/me',getLoggedInUser);
 router.post('/register', createUser);
 router.post('/login', loginUser);
-router.get('/',verifyToken,verifyAdmin, getAllUsers);
+router.get('/', getAllUsers);
 router.get('/:id',verifyToken, getUserById);
 router.put('/:id',verifyToken, updateUser);
-router.delete('/:id',verifyToken,verifyAdmin, deleteUser);
+router.delete('/:id', deleteUser);
+router.delete('/',deleteAllUser);
 export default router;

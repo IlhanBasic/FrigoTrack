@@ -138,3 +138,11 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const deleteAllUser = async (req, res) => {
+  try {
+    const deletedUsers = await User.deleteMany({});
+    res.status(200).json({ message: `${deletedUsers.deletedCount} users deleted successfully.` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

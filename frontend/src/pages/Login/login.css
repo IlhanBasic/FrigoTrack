@@ -19,6 +19,7 @@
   align-items: center;
   padding: 2em;
   text-align: center;
+  gap: 1em;
 }
 
 .login-container img {

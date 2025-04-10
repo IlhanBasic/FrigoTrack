@@ -3,6 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { authActions } from "../../store/auth-slice";
+import { toast } from "react-toastify";
+
+const api_url = import.meta.env.VITE_API_URL;
 
 export default function RootLayout() {
   const user = useSelector((state) => state.auth.user);
@@ -13,7 +16,7 @@ export default function RootLayout() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/users/me", {
+        const response = await fetch(`${api_url}/users/me`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -38,6 +41,7 @@ export default function RootLayout() {
         navigate("/auth");
       }
     };
+
     const getCookie = (name) => {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -53,9 +57,5 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <>
-      <Outlet />
-    </>
-  );
+  return <Outlet />;
 }
