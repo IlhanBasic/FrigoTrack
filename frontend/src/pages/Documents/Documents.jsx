@@ -1,0 +1,4 @@
+import "./documents.css";
+export default function Documents() {
+  return <h1>Documents !!!</h1>;
+}

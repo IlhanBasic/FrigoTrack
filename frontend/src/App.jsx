@@ -5,12 +5,24 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./pages/Home/Home.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Products from "./pages/Products/Products.jsx";
+import Partners from "./pages/Partners/Partners.jsx";
+import Payments from "./pages/Payments/Payments.jsx";
+import Rooms from "./pages/Rooms/Rooms.jsx";
+import Documents from "./pages/Documents/Documents.jsx";
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
       element: <RootLayout />,
-      children: [{ index: true, element: <Home /> }],
+      children: [
+        { index: true, element: <Home /> },
+        { path: "/products", element: <Products /> },
+        { path: "/documents", element: <Documents /> },
+        { path: "/payments", element: <Payments /> },
+        { path: "/rooms", element: <Rooms /> },
+        { path: "/partners", element: <Partners /> },
+      ],
     },
     { path: "/auth", element: <Login /> },
     { path: "/register", element: <Register /> },
