@@ -6,5 +6,5 @@
   font-family: "Inter", "Montserrat", "Roboto", sans-serif;
 }
 body {
-  margin-top: 7%;
+  overflow: hidden;
 }

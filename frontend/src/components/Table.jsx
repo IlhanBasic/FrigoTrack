@@ -1,4 +1,6 @@
 import "./table.css";
+import Search from "./Search";
+import { useState, useEffect } from "react";
 const TABLEHEADERS = {
   _id: "ID",
   roomNumber: "Broj Sobe",
@@ -46,6 +48,23 @@ const TABLEHEADERS = {
   method: "Metoda placanja",
 };
 export default function Table({ items }) {
+  const [term, setTerm] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
+
+  useEffect(() => {
+    if (term.trim() === "") {
+      setFilteredItems(items);
+    } else {
+      const filtered = items.filter((item) =>
+        Object.keys(item).some((key) => {
+          const value = String(item[key]).toLowerCase();
+          return value.includes(term.toLowerCase());
+        })
+      );
+      setFilteredItems(filtered);
+    }
+  }, [term, items]);
+
   if (!Array.isArray(items) || items.length === 0) {
     return (
       <>
@@ -58,52 +77,57 @@ export default function Table({ items }) {
   const headers = Object.keys(items[0]);
 
   return (
-    <table className="table">
-      <thead>
-        <tr>
-          {headers
-            .filter(
-              (key) =>
-                typeof items[0][key] !== "object" &&
-                !["_id", "createdAt", "updatedAt", "__v"].includes(key)
-            )
-            .map((key) => (
-              <th key={key}>{TABLEHEADERS[key] || key}</th>
+    <>
+      <Search term={term} setTerm={setTerm} />
+      <div className="table-wrapper">
+        <table className="table">
+          <thead>
+            <tr>
+              {headers
+                .filter(
+                  (key) =>
+                    typeof items[0][key] !== "object" &&
+                    !["_id", "createdAt", "updatedAt", "__v"].includes(key)
+                )
+                .map((key) => (
+                  <th key={key}>{TABLEHEADERS[key] || key}</th>
+                ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredItems.map((item, index) => (
+              <tr key={item._id || index}>
+                {headers
+                  .filter(
+                    (key) =>
+                      typeof item[key] !== "object" &&
+                      !["_id", "createdAt", "updatedAt", "__v"].includes(key)
+                  )
+                  .map((key) => (
+                    <td key={key}>
+                      {[
+                        "date",
+                        "startDate",
+                        "endDate",
+                        "expiryDate",
+                        "paymentDate",
+                      ].includes(key)
+                        ? new Intl.DateTimeFormat("hr-HR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          }).format(new Date(item[key]))
+                        : String(item[key])}
+                    </td>
+                  ))}
+              </tr>
             ))}
-        </tr>
-      </thead>
-      <tbody>
-        {items.map((item, index) => (
-          <tr key={item._id || index}>
-            {headers
-              .filter(
-                (key) =>
-                  typeof item[key] !== "object" &&
-                  !["_id", "createdAt", "updatedAt", "__v"].includes(key)
-              )
-              .map((key) => (
-                <td key={key}>
-                  {[
-                    "date",
-                    "startDate",
-                    "endDate",
-                    "expiryDate",
-                    "paymentDate",
-                  ].includes(key)
-                    ? new Intl.DateTimeFormat("hr-HR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      }).format(new Date(item[key]))
-                    : String(item[key])}
-                </td>
-              ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
