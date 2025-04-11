@@ -8,16 +8,8 @@ const partnerSchema = new mongoose.Schema({
     isVATRegistered: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     type: { type: String, enum: ['poljoprivrednik', 'kupac'], required: true },
-    bankDetails: {
-      accountNumber: String,
-      bankName: String
-    },
-    contracts: [{
-      type: String,
-      startDate: Date,
-      endDate: Date,
-      fileUrl: String
-    }]
+    accountNumber: {type: String},
+    bankName: {type: String},
   }, { timestamps: true });  
 
 export default mongoose.model('Partner', partnerSchema);
