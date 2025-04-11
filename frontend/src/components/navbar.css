@@ -145,3 +145,17 @@
     display: none;
   }
 }
+.logout-btn {
+  cursor: pointer;
+}
+.logout-btn:hover {
+  animation: scale 1s infinite;
+}
+@keyframes scale {
+  0% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

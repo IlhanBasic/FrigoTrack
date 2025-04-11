@@ -24,6 +24,7 @@ const authSlice = createSlice({
     },
     logout(state) {
       Object.assign(state, initialState);
+      fetch(`${import.meta.env.VITE_API_URL}/users/logout`, { method: "GET", credentials: "include" });
     },
     setToken(state, action) {
       state.token = action.payload;
