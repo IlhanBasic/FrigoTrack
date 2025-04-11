@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { authActions } from "../../store/auth-slice";
 import BtnToTop from "../../components/BtnToTop";
-
+import Navbar from "../../components/Navbar";
 const api_url = import.meta.env.VITE_API_URL;
 
 export default function RootLayout() {
@@ -59,6 +59,7 @@ export default function RootLayout() {
 
   return (
     <>
+      <Navbar />
       <Outlet />
       <BtnToTop />
     </>

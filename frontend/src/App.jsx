@@ -11,6 +11,7 @@ import Payments from "./pages/Payments/Payments.jsx";
 import Rooms from "./pages/Rooms/Rooms.jsx";
 import Documents from "./pages/Documents/Documents.jsx";
 import Error from "./pages/Error/Error.jsx";
+import Stats from "./pages/Stats/Stats.jsx";
 function App() {
   const router = createBrowserRouter([
     {
@@ -24,6 +25,7 @@ function App() {
         { path: "/payments", element: <Payments /> },
         { path: "/rooms", element: <Rooms /> },
         { path: "/partners", element: <Partners /> },
+        { path: "/stats", element: <Stats /> },
       ],
     },
     { path: "/auth", element: <Login /> },
