@@ -75,7 +75,22 @@ export default function Table({ items }) {
   }
 
   const headers = Object.keys(items[0]);
-
+  function handleSort(key) {
+    setFilteredItems((prevState) => {
+      let asc = [...prevState].sort((a, b) => {
+        const aValue = a[key];
+        const bValue = b[key];
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return aValue.localeCompare(bValue);
+        }
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return aValue - bValue;
+        }
+        return String(aValue).localeCompare(String(bValue));
+      });
+      return asc;
+    });
+  }
   return (
     <>
       <Search term={term} setTerm={setTerm} />
@@ -90,7 +105,9 @@ export default function Table({ items }) {
                     !["_id", "createdAt", "updatedAt", "__v"].includes(key)
                 )
                 .map((key) => (
-                  <th key={key}>{TABLEHEADERS[key] || key}</th>
+                  <th onClick={() => handleSort(key)} key={key}>
+                    {TABLEHEADERS[key] || key}
+                  </th>
                 ))}
             </tr>
           </thead>

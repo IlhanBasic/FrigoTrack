@@ -36,7 +36,7 @@ export const createPartner = async (req, res) => {
 
   try {
     // Provera da li partner sa istim PIB/JMBG već postoji
-    const existingPartner = await Partner.findOne(req.params.id);
+    const existingPartner = await Partner.findOne({ pibOrJmbg });
     if (existingPartner) {
       return res
         .status(400)

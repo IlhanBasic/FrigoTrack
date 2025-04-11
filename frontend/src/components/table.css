@@ -29,6 +29,7 @@
   color: #495057;
   border-bottom: 2px solid #dee2e6;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .table td {
