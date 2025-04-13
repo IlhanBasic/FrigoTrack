@@ -1,73 +1,124 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./navbar.css";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { LogOut } from "lucide-react";
 import { authActions } from "../store/auth-slice";
+
 export default function Navbar() {
   const dispatch = useDispatch();
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userInfo, setUserInfo] = useState({});
   const user = useSelector((state) => state.auth.user);
+
   useEffect(() => {
-    setUserInfo(user);
+    function handleResize() {
+      setIsSmallScreen(window.innerWidth < 480);
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
   function logout() {
     dispatch(authActions.logout());
   }
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-brand">
           <span>❄️ FrigoTrack</span>
-          <span className="user">Korisnik:{userInfo.username}</span>
-          <span onClick={()=>logout()} className="logout-btn">
+          {!isSmallScreen && (
+            <span className="user">Korisnik: {user?.username}</span>
+          )}
+          <span onClick={logout} className="logout-btn">
             <LogOut />
           </span>
-          <button className="menu-toggle" onClick={toggleMenu}>
-            <span className="hamburger"></span>
-          </button>
+          {isSmallScreen && (
+            <button className="menu-toggle" onClick={toggleMenu}>
+              <span
+                className={`hamburger ${isMenuOpen ? "active" : ""}`}
+              ></span>
+            </button>
+          )}
         </div>
 
         <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
           <li>
-            <NavLink to="/" end>
+            <NavLink
+              to="/"
+              end
+              onClick={() => isSmallScreen && setIsMenuOpen(false)}
+            >
               Početna
             </NavLink>
           </li>
           <li>
-            <NavLink to="/rooms" end>
+            <NavLink
+              to="/rooms"
+              end
+              onClick={() => isSmallScreen && setIsMenuOpen(false)}
+            >
               Hladnjače
             </NavLink>
           </li>
           <li>
-            <NavLink to="/partners" end>
+            <NavLink
+              to="/partners"
+              end
+              onClick={() => isSmallScreen && setIsMenuOpen(false)}
+            >
               Partneri
             </NavLink>
           </li>
           <li>
-            <NavLink to="/products" end>
+            <NavLink
+              to="/products"
+              end
+              onClick={() => isSmallScreen && setIsMenuOpen(false)}
+            >
               Proizvodi
             </NavLink>
           </li>
           <li>
-            <NavLink to="/documents" end>
+            <NavLink
+              to="/documents"
+              end
+              onClick={() => isSmallScreen && setIsMenuOpen(false)}
+            >
               Dokumenta
             </NavLink>
           </li>
           <li>
-            <NavLink to="/payments" end>
+            <NavLink
+              to="/payments"
+              end
+              onClick={() => isSmallScreen && setIsMenuOpen(false)}
+            >
               Plaćanja
             </NavLink>
           </li>
           <li>
-            <NavLink to="/stats" end>
+            <NavLink
+              to="/stats"
+              end
+              onClick={() => isSmallScreen && setIsMenuOpen(false)}
+            >
               Statistika
             </NavLink>
           </li>
+          {isSmallScreen && (
+            <li>
+              <span className="user">Korisnik: {user?.username}</span>
+            </li>
+          )}
         </ul>
       </div>
     </nav>
