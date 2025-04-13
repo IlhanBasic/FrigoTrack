@@ -31,7 +31,6 @@ export default function CreateDocumentForm() {
     const status = formData.get("status");
 
     try {
-      // Get user ID
       const userResponse = await fetch(
         `${import.meta.env.VITE_API_URL}/users/${user}`,
         {
@@ -50,7 +49,6 @@ export default function CreateDocumentForm() {
       }
       userId = userData._id;
 
-      // Get products details
       const productsResponse = await fetch(`${import.meta.env.VITE_API_URL}/products`);
       const productsData = await productsResponse.json();
       
@@ -58,7 +56,6 @@ export default function CreateDocumentForm() {
         throw new Error(productsData.message);
       }
 
-      // Map products to items with proper structure
       const documentItems = products.map(product => {
         const matchingProduct = productsData.find(
           p => p.name === product.productId && p.variety === product.varietyId
@@ -78,7 +75,6 @@ export default function CreateDocumentForm() {
         };
       });
 
-      // Create document
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/documents`,
         {
@@ -155,7 +151,6 @@ export default function CreateDocumentForm() {
         ];
       });
       
-      // Reset form fields after adding item
       setSelectedProduct("");
       setSelectedVariety("");
       setQuantity("");
@@ -171,6 +166,7 @@ export default function CreateDocumentForm() {
       );
     }
   }
+
 
   return (
     <div className="create-form">
