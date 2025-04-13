@@ -33,7 +33,6 @@ const documentSchema = new mongoose.Schema(
       default: "u pripremi",
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    notes: String,
   },
   { timestamps: true }
 );

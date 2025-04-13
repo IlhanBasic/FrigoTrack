@@ -1,10 +1,24 @@
 import "./search.css";
-export default function Search({ term, setTerm }) {
-  function handleSearch() {}
+import { useNavigate } from "react-router-dom";
+export default function Search({ term, setTerm, type }) {
+  const navigate = useNavigate();
+  function handleChangeUrl() {
+    if (
+      type === "partnera" ||
+      type === "proizvod" ||
+      type === "dokument" ||
+      type === "placanje" ||
+      type === "prostor"
+    ) {
+      navigate(`create`);
+    }
+  }
   return (
     <div className="search-container">
       <div className="action-group crud-btns">
-        <button className="action-btn btn-create">btn1</button>
+        <button onClick={handleChangeUrl} className="action-btn btn-create">
+          Dodaj {type}
+        </button>
         <button className="action-btn btn-update">btn2</button>
       </div>
 

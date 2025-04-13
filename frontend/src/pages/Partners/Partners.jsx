@@ -27,7 +27,7 @@ export default function Partners() {
   }
   return (
     <>
-      <Table items={partners} />
+      <Table items={partners} type={"partnera"} />
     </>
   );
 }

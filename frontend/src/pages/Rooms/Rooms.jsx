@@ -27,7 +27,7 @@ export default function Rooms() {
   }
   return (
     <>
-      <Table items={rooms} />
+      <Table items={rooms} type={"prostor"} />
     </>
   );
 }

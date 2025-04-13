@@ -1,53 +1,8 @@
 import "./table.css";
 import Search from "./Search";
 import { useState, useEffect } from "react";
-const TABLEHEADERS = {
-  _id: "ID",
-  roomNumber: "Broj Sobe",
-  location: "Lokacija",
-  temperature: "Temperatura (°C)",
-  capacityKg: "Kapacitet (KG)",
-  currentLoadKg: "Tezina (KG)",
-  type: "Tip",
-  isActive: "Aktivan",
-  createdAt: "Datum kreiranja",
-  updatedAt: "Datum azuriranja",
-  email: "Email",
-  address: "Adresa",
-  phone: "Telefon",
-  pibOrJmbg: "PIB/JMBG",
-  isVATRegistered: "Registracija PDV-a",
-  accountNumber: "Broj racuna",
-  bankName: "Banka",
-  startDate: "Datum pocetka",
-  endDate: "Datum kraja",
-  fileUrl: "URL fajla",
-  name: "Ime",
-  variety: "Vrsta",
-  harvestYear: "Godina",
-  sku: "SKU",
-  purchasePrice: "Cena kupovine (RSD)",
-  sellingPrice: "Cena prodaje (RSD)",
-  vatRate: "PDV (%)",
-  currentStockKg: "Tezina na stanju (KG)",
-  minStockKg: "Minimalna tezina na stanju (KG)",
-  sugarContent: "Kolicina sećera (%)",
-  acidity: "Kiselost (°pH)",
-  brix: "Brix (%)",
-  freezingMethod: "Metoda zamrzavanja",
-  expiryDate: "Datum isteka",
-  documentNumber: "Broj dokumenta",
-  date: "Datum",
-  driverName: "Ime vozaca",
-  vehiclePlate: "Registarska oznaka vozila",
-  cost: "Trosak prevoza (RSD)",
-  notes: "Opis",
-  status: "Status",
-  amountPaid: "Placeno (RSD)",
-  paymentDate: "Datum placanja",
-  method: "Metoda placanja",
-};
-export default function Table({ items }) {
+import { TABLEHEADERS } from "../data/data.js";
+export default function Table({ items,type }) {
   const [term, setTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
 
@@ -68,6 +23,7 @@ export default function Table({ items }) {
   if (!Array.isArray(items) || items.length === 0) {
     return (
       <>
+      <Search term={term} setTerm={setTerm} type={type} />
         <p>Tabela je prazna.</p>
         <hr />
       </>
@@ -93,7 +49,7 @@ export default function Table({ items }) {
   }
   return (
     <>
-      <Search term={term} setTerm={setTerm} />
+      <Search term={term} setTerm={setTerm} type={type} />
       <div className="table-wrapper">
         <table className="table">
           <thead>

@@ -18,7 +18,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use('/api/users', userRoute);
-app.use('/api/coldRooms', coldRoute);
+app.use('/api/coldrooms', coldRoute);
 app.use('/api/partners', partnerRoute);
 app.use('/api/products', productRoute);
 app.use('/api/documents', documentRoute);
