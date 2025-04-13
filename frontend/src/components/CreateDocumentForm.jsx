@@ -1,3 +1,4 @@
+import React from 'react';
 import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -5,6 +6,7 @@ import { useSelector } from "react-redux";
 import "./createform.css";
 import { VARIETY, PRODUCTS } from "../data/data.js";
 import { Trash, Plus } from "lucide-react";
+
 export default function CreateDocumentForm() {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedVariety, setSelectedVariety] = useState("");
@@ -13,9 +15,11 @@ export default function CreateDocumentForm() {
   const [items, setItems] = useState([]);
   const [products, setProducts] = useState([]);
   const user = useSelector((state) => state.auth.user.username);
+  const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
 
   async function createDocumentAction(prevFormState, formData) {
+    let userId = "";
     const type = formData.get("type");
     const documentNumber = formData.get("documentNumber");
     const date = formData.get("date");
@@ -25,47 +29,76 @@ export default function CreateDocumentForm() {
     const vehiclePlate = formData.get("vehiclePlate");
     const cost = Number(formData.get("cost"));
     const status = formData.get("status");
-    console.log({
-      type,
-      documentNumber,
-      date,
-      partnerId,
-      notes,
-      driverName,
-      vehiclePlate,
-      cost,
-      status,
-      createdBy: user,
-      products,
-    });
+
     try {
+      // Get user ID
+      const userResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/users/${user}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        }
+      );
+
+      const userData = await userResponse.json();
+      if (!userResponse.ok) {
+        throw new Error(userData.message);
+      }
+      userId = userData._id;
+
+      // Get products details
+      const productsResponse = await fetch(`${import.meta.env.VITE_API_URL}/products`);
+      const productsData = await productsResponse.json();
+      
+      if (!productsResponse.ok) {
+        throw new Error(productsData.message);
+      }
+
+      // Map products to items with proper structure
+      const documentItems = products.map(product => {
+        const matchingProduct = productsData.find(
+          p => p.name === product.productId && p.variety === product.varietyId
+        );
+
+        if (!matchingProduct) {
+          throw new Error(`Product not found: ${product.productId} - ${product.varietyId}`);
+        }
+
+        return {
+          productId: matchingProduct._id,
+          variety: matchingProduct.variety,
+          quantity: product.quantity,
+          pricePerUnit: matchingProduct.sellingPrice,
+          vatRate: 20,
+          total: product.quantity * matchingProduct.sellingPrice * (1 + 20 / 100),
+        };
+      });
+
+      // Create document
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/documents`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             type,
             documentNumber,
             date,
             partner: partnerId,
-            items: [
-              ...products.map((item) => ({
-                productId: item.productId,
-                variety: item.variety,
-                quantity: item.quantity,
-                pricePerUnit: 0,
-                vatRate: 20,
-                total: item.quantity * 0 * (1 + 20 / 100),
-              })),
-            ],
+            items: documentItems,
             notes,
             driverName,
             vehiclePlate,
             cost,
             status,
-            createdBy: user,
-            products,
+            createdBy: userId,
           }),
         }
       );
@@ -76,11 +109,11 @@ export default function CreateDocumentForm() {
         return { errors: null };
       } else {
         const errorData = await response.json();
-        return { errors: errorData };
+        return { errors: [errorData.message] };
       }
     } catch (err) {
-      console.log(err);
-      return { errors: ["Došlo je do greške pri slanju zahtjeva."] };
+      console.error(err);
+      return { errors: [err.message || "Došlo je do greške pri slanju zahtjeva."] };
     }
   }
 
@@ -121,6 +154,11 @@ export default function CreateDocumentForm() {
           },
         ];
       });
+      
+      // Reset form fields after adding item
+      setSelectedProduct("");
+      setSelectedVariety("");
+      setQuantity("");
     }
   }
 
@@ -178,7 +216,7 @@ export default function CreateDocumentForm() {
               -- Izaberite partnera --
             </option>
             {partners.map((partner) => (
-              <option key={partner.id} value={partner._id}>
+              <option key={partner._id} value={partner._id}>
                 {partner.name} - {partner.pibOrJmbg}
               </option>
             ))}
@@ -212,11 +250,8 @@ export default function CreateDocumentForm() {
                 name="product"
                 onChange={(e) => setSelectedProduct(e.target.value)}
                 value={selectedProduct}
-                required
               >
-                <option value="" disabled>
-                  -- Izaberite proizvod --
-                </option>
+                <option value="">-- Izaberite proizvod --</option>
                 {PRODUCTS.map((item) => (
                   <option key={item} value={item}>
                     {item}
@@ -232,12 +267,9 @@ export default function CreateDocumentForm() {
                 name="variety"
                 onChange={(e) => setSelectedVariety(e.target.value)}
                 value={selectedVariety}
-                required
                 disabled={!selectedProduct}
               >
-                <option value="" disabled>
-                  -- Izaberite tip --
-                </option>
+                <option value="">-- Izaberite tip --</option>
                 {selectedProduct &&
                   VARIETY[selectedProduct]?.map((item) => (
                     <option key={item} value={item}>
@@ -255,11 +287,15 @@ export default function CreateDocumentForm() {
                 name="quantity"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                required
               />
             </div>
 
-            <button type="button" className="add-button" onClick={addItem}>
+            <button 
+              type="button" 
+              className="add-button" 
+              onClick={addItem}
+              disabled={!selectedProduct || !selectedVariety || !quantity}
+            >
               <Plus />
             </button>
           </div>
@@ -277,7 +313,7 @@ export default function CreateDocumentForm() {
 
         <div className="form-group">
           <label htmlFor="cost">Trošak:</label>
-          <input type="number" id="cost" name="cost" />
+          <input type="number" id="cost" name="cost" defaultValue={0} />
         </div>
 
         <div className="form-group">
@@ -320,7 +356,9 @@ export default function CreateDocumentForm() {
           </div>
         )}
 
-        <button type="submit">Dodaj Dokument</button>
+        <button type="submit" disabled={products.length === 0}>
+          Dodaj Dokument
+        </button>
       </form>
     </div>
   );
