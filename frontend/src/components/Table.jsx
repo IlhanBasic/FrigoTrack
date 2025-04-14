@@ -199,6 +199,7 @@ export default function Table({ items, type }) {
   function editItem(id) {
     navigate("edit/" + id);
   }
+
   return (
     <>
       <Search
@@ -229,14 +230,19 @@ export default function Table({ items, type }) {
           <tbody>
             {filteredItems.map((item, index) => (
               <tr key={item._id || index}>
-                {type === "partnera" || type === "proizvod" || type === "prostor" || type === "dokument" ? (
+                {type === "partnera" ||
+                type === "proizvod" ||
+                type === "prostor" ||
+                type === "dokument" ? (
                   <td className="action-ceil">
-                    {type !== "dokument" && <button
-                      className="delete-button"
-                      onClick={() => deleteItem(item._id)}
-                    >
-                      <Trash2 />
-                    </button>}
+                    {type !== "dokument" && (
+                      <button
+                        className="delete-button"
+                        onClick={() => deleteItem(item._id)}
+                      >
+                        <Trash2 />
+                      </button>
+                    )}
                     <button
                       className="edit-button"
                       onClick={() => {
@@ -246,9 +252,7 @@ export default function Table({ items, type }) {
                       <Edit />
                     </button>
                   </td>
-                ) : (
-                 null
-                )}
+                ) : null}
                 {headers
                   .filter(
                     (key) =>
