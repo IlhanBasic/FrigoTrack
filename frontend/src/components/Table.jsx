@@ -212,7 +212,7 @@ export default function Table({ items, type }) {
         <table className="table">
           <thead>
             <tr>
-              <th>Akcije</th>
+              {type !== "placanje" && <th>Akcije</th>}
               {headers
                 .filter(
                   (key) =>
@@ -229,14 +229,14 @@ export default function Table({ items, type }) {
           <tbody>
             {filteredItems.map((item, index) => (
               <tr key={item._id || index}>
-                {type === "partnera" || type === "proizvod" || type === "prostor" ? (
+                {type === "partnera" || type === "proizvod" || type === "prostor" || type === "dokument" ? (
                   <td className="action-ceil">
-                    <button
+                    {type !== "dokument" && <button
                       className="delete-button"
                       onClick={() => deleteItem(item._id)}
                     >
                       <Trash2 />
-                    </button>
+                    </button>}
                     <button
                       className="edit-button"
                       onClick={() => {
@@ -247,7 +247,7 @@ export default function Table({ items, type }) {
                     </button>
                   </td>
                 ) : (
-                  <td></td>
+                 null
                 )}
                 {headers
                   .filter(

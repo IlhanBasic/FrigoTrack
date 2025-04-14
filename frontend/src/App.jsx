@@ -18,6 +18,9 @@ import CreateColdRoom from "./pages/Rooms/CreateColdRoom.jsx";
 import CreateProduct from "./pages/Products/CreateProduct.jsx";
 import CreateDocument from "./pages/Documents/CreateDocument.jsx";
 import EditColdRoom from "./pages/Rooms/EditColdRoom.jsx";
+import EditPartner from "./pages/Partners/EditPartner.jsx";
+import EditProduct from "./pages/Products/EditProduct.jsx";
+import EditDocument from "./pages/Documents/EditDocument.jsx";
 function App() {
   const router = createBrowserRouter([
     {
@@ -31,6 +34,7 @@ function App() {
           children: [
             { index: true, element: <Products /> },
             { path: "create", element: <CreateProduct /> },
+            {path:"edit/:id",element:<EditProduct />}
           ],
         },
         {
@@ -38,6 +42,7 @@ function App() {
           children: [
             { index: true, element: <Documents /> },
             { path: "create", element: <CreateDocument /> },
+            {path:"edit/:id",element:<EditDocument />}
           ],
         },
         {
@@ -60,6 +65,7 @@ function App() {
           children: [
             { index: true, element: <Partners /> },
             { path: "create", element: <CreatePartner /> },
+            { path: "edit/:id", element: <EditPartner /> },
           ],
         },
         { path: "/stats", element: <Stats /> },
