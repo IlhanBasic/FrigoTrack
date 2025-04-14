@@ -17,6 +17,7 @@ import CreatePayment from "./pages/Payments/CreatePayment.jsx";
 import CreateColdRoom from "./pages/Rooms/CreateColdRoom.jsx";
 import CreateProduct from "./pages/Products/CreateProduct.jsx";
 import CreateDocument from "./pages/Documents/CreateDocument.jsx";
+import EditColdRoom from "./pages/Rooms/EditColdRoom.jsx";
 function App() {
   const router = createBrowserRouter([
     {
@@ -51,6 +52,7 @@ function App() {
           children: [
             { index: true, element: <Rooms /> },
             { path: "create", element: <CreateColdRoom /> },
+            { path: "edit/:id", element: <EditColdRoom /> },
           ],
         },
         {

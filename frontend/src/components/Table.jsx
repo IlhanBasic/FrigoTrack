@@ -4,10 +4,19 @@ import { useState, useEffect, useRef } from "react";
 import { TABLEHEADERS } from "../data/data.js";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
+import { Trash2, Edit } from "lucide-react";
+import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
-
+import { useNavigate } from "react-router-dom";
+const TABLES = {
+  partnera: "partners",
+  proizvod: "products",
+  dokument: "documents",
+  placanje: "payments",
+  prostor: "cooldrooms",
+};
 export default function Table({ items, type }) {
+  const navigate = useNavigate();
   const [term, setTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const tableRef = useRef(null);
@@ -164,7 +173,32 @@ export default function Table({ items, type }) {
   }
 
   const headers = Object.keys(items[0]);
-
+  async function deleteItem(id) {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/${TABLES[type]}/${id}`,
+        { method: "DELETE" }
+      );
+      if (response.ok) {
+        window.location.reload();
+        toast.success("Uspesno obrisano!");
+      } else {
+        const error = await response.json();
+        console.log(error);
+        toast.error("Greska prilikom brisanja!");
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        toast.error("Neautorizovani pristup!");
+      } else {
+        console.log(error);
+        toast.error("Greska prilikom brisanja!");
+      }
+    }
+  }
+  function editItem(id) {
+    navigate("edit/" + id);
+  }
   return (
     <>
       <Search
@@ -178,6 +212,7 @@ export default function Table({ items, type }) {
         <table className="table">
           <thead>
             <tr>
+              <th>Akcije</th>
               {headers
                 .filter(
                   (key) =>
@@ -194,6 +229,26 @@ export default function Table({ items, type }) {
           <tbody>
             {filteredItems.map((item, index) => (
               <tr key={item._id || index}>
+                {type === "partnera" || type === "proizvod" || type === "prostor" ? (
+                  <td className="action-ceil">
+                    <button
+                      className="delete-button"
+                      onClick={() => deleteItem(item._id)}
+                    >
+                      <Trash2 />
+                    </button>
+                    <button
+                      className="edit-button"
+                      onClick={() => {
+                        editItem(item._id);
+                      }}
+                    >
+                      <Edit />
+                    </button>
+                  </td>
+                ) : (
+                  <td></td>
+                )}
                 {headers
                   .filter(
                     (key) =>
@@ -228,4 +283,3 @@ export default function Table({ items, type }) {
     </>
   );
 }
-
