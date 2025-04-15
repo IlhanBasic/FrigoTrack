@@ -34,7 +34,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-brand">
-          <span>❄️ FrigoTrack</span>
+          <span>❄️ FrigoTrack 🌡</span>
           {!isSmallScreen && (
             <span className="user">Korisnik: {user?.username}</span>
           )}

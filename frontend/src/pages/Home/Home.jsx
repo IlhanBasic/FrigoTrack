@@ -1,67 +1,98 @@
-import { useState } from "react";
-import { BarChart, TrendingUp, TrendingDown, Package, Thermometer, Users, DollarSign } from "lucide-react";
+import { useEffect, useState } from "react";
+import { BarChart, TrendingUp, TrendingDown, Thermometer } from "lucide-react";
 import "./home.css";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
+
 export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [products, setProducts] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [coldRooms, setColdRooms] = useState([]);
+  const [supplies, setSupplies] = useState([]);
   const user = useSelector((state) => state.auth.user);
-  // Mock data - replace with real data from your API
-  const metrics = {
-    totalStock: "458,230 kg",
-    availableCapacity: "75%",
-    activeOrders: "24",
-    revenue: "€45,890",
-  };
 
-  const stockData = [
-    {
-      id: 1,
-      product: "Jabuke",
-      quantity: "125,000 kg",
-      temperature: "-2°C",
-      status: "optimal",
-      lastUpdated: "2024-03-15",
-    },
-    {
-      id: 2,
-      product: "Kruške",
-      quantity: "85,000 kg",
-      temperature: "-1.5°C",
-      status: "high",
-      lastUpdated: "2024-03-15",
-    },
-    {
-      id: 3,
-      product: "Šljive",
-      quantity: "15,000 kg",
-      temperature: "-1°C",
-      status: "low",
-      lastUpdated: "2024-03-14",
-    },
-    {
-      id: 4,
-      product: "Višnje",
-      quantity: "95,000 kg",
-      temperature: "-2°C",
-      status: "optimal",
-      lastUpdated: "2024-03-15",
-    },
-    {
-      id: 5,
-      product: "Maline",
-      quantity: "138,230 kg",
-      temperature: "-18°C",
-      status: "high",
-      lastUpdated: "2024-03-15",
-    },
-  ];
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/products`
+        );
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        setProducts(data);
+        setSupplies([...data]);
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
-  const filteredStock = stockData.filter(item => {
-    if (selectedProduct !== "all" && item.product !== selectedProduct) return false;
-    if (selectedStatus !== "all" && item.status !== selectedStatus) return false;
-    return true;
-  });
+    async function fetchOrders() {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/documents`
+        );
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        setDocuments(data.data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function fetchColdRooms() {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/coldrooms`
+        );
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        setColdRooms(data.data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchProducts();
+    fetchOrders();
+    fetchColdRooms();
+  }, []);
+
+  function handleFilterByProduct(product) {
+    setSelectedProduct(product);
+    let filtered = [...products];
+    if (product !== "all") {
+      filtered = filtered.filter((item) => item.name === product);
+    }
+    if (selectedStatus === "low") {
+      filtered = filtered.filter(
+        (item) => item.minStockKg > item.currentStockKg
+      );
+    } else if (selectedStatus === "optimal") {
+      filtered = filtered.filter(
+        (item) => item.minStockKg < item.currentStockKg
+      );
+    }
+    setSupplies(filtered);
+  }
+
+  function handleFilterByStatus(status) {
+    setSelectedStatus(status);
+    let filtered = [...products];
+    if (selectedProduct !== "all") {
+      filtered = filtered.filter((item) => item.name === selectedProduct);
+    }
+    if (status === "low") {
+      filtered = filtered.filter(
+        (item) => item.minStockKg > item.currentStockKg
+      );
+    } else if (status === "optimal") {
+      filtered = filtered.filter(
+        (item) => item.minStockKg < item.currentStockKg
+      );
+    }
+    setSupplies(filtered);
+  }
 
   return (
     <div className="home-container">
@@ -73,7 +104,13 @@ export default function Home() {
       <div className="metrics-grid">
         <div className="metric-card">
           <h3>Ukupne zalihe</h3>
-          <div className="value">{metrics.totalStock}</div>
+          <div className="value">
+            {products.reduce(
+              (acc, product) => acc + product.currentStockKg,
+              0
+            ) / 1000.0}{" "}
+            t
+          </div>
           <div className="trend">
             <TrendingUp size={16} />
             +5.3% od prošle nedelje
@@ -82,7 +119,13 @@ export default function Home() {
 
         <div className="metric-card">
           <h3>Raspoloživi kapacitet</h3>
-          <div className="value">{metrics.availableCapacity}</div>
+          <div className="value">
+            {coldRooms.reduce(
+              (acc, room) => acc + (room.capacityKg - room.currentLoadKg),
+              0
+            ) / 1000.0}{" "}
+            t
+          </div>
           <div className="trend negative">
             <TrendingDown size={16} />
             -8% od prošlog meseca
@@ -91,7 +134,9 @@ export default function Home() {
 
         <div className="metric-card">
           <h3>Aktivne porudžbine</h3>
-          <div className="value">{metrics.activeOrders}</div>
+          <div className="value">
+            {documents.filter((doc) => doc.type === "otkup").length}
+          </div>
           <div className="trend">
             <TrendingUp size={16} />
             +12% od prošle nedelje
@@ -100,7 +145,20 @@ export default function Home() {
 
         <div className="metric-card">
           <h3>Prihod ovog meseca</h3>
-          <div className="value">{metrics.revenue}</div>
+          <div className="value">
+            {new Intl.NumberFormat("sr-RS", {
+              style: "currency",
+              currency: "RSD",
+            }).format(
+              documents
+                .filter((doc) => doc.type === "prodaja" && new Date() - new Date(doc.date) <= 30 * 24 * 60 * 60 * 1000)
+                .reduce(
+                  (acc, doc) =>
+                    acc + doc.items.reduce((acc, item) => acc + item.total, 0),
+                  0
+                )
+            )}
+          </div>
           <div className="trend">
             <TrendingUp size={16} />
             +15.8% od prošlog meseca
@@ -114,24 +172,23 @@ export default function Home() {
           <div className="stock-filters">
             <select
               value={selectedProduct}
-              onChange={(e) => setSelectedProduct(e.target.value)}
+              onChange={(e) => handleFilterByProduct(e.target.value)}
             >
               <option value="all">Svi proizvodi</option>
-              {stockData.map(item => (
-                <option key={item.id} value={item.product}>
-                  {item.product}
+              {[...new Set(products.map((item) => item.name))].map((name) => (
+                <option key={name} value={name}>
+                  {name}
                 </option>
               ))}
             </select>
 
             <select
               value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              onChange={(e) => handleFilterByStatus(e.target.value)}
             >
               <option value="all">Svi statusi</option>
               <option value="low">Nizak nivo</option>
               <option value="optimal">Optimalan</option>
-              <option value="high">Visok nivo</option>
             </select>
           </div>
         </div>
@@ -141,25 +198,35 @@ export default function Home() {
             <tr>
               <th>Proizvod</th>
               <th>Količina</th>
-              <th>Temperatura</th>
+              <th>Datum isteka</th>
               <th>Status</th>
-              <th>Poslednje ažuriranje</th>
             </tr>
           </thead>
           <tbody>
-            {filteredStock.map((item) => (
-              <tr key={item.id}>
-                <td>{item.product}</td>
-                <td>{item.quantity}</td>
-                <td>{item.temperature}</td>
+            {supplies.map((item) => (
+              <tr key={item._id}>
                 <td>
-                  <span className={`status-badge ${item.status}`}>
-                    {item.status === "low" && "Nizak nivo"}
-                    {item.status === "optimal" && "Optimalan"}
-                    {item.status === "high" && "Visok nivo"}
+                  {item.name} - {item.variety}
+                </td>
+                <td>{item.currentStockKg / 1000.0} t</td>
+                <td>
+                  {new Intl.DateTimeFormat("hr-HR", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                  }).format(new Date(item.expiryDate))}
+                </td>
+                <td>
+                  <span
+                    className={`status-badge ${
+                      item.minStockKg > item.currentStockKg ? "low" : "optimal"
+                    }`}
+                  >
+                    {item.minStockKg > item.currentStockKg
+                      ? "Nizak nivo"
+                      : "Optimalan"}
                   </span>
                 </td>
-                <td>{new Date(item.lastUpdated).toLocaleDateString("sr-RS")}</td>
               </tr>
             ))}
           </tbody>
@@ -169,17 +236,21 @@ export default function Home() {
       <section className="chart-section">
         <div className="chart-card">
           <h3>Iskorišćenost kapaciteta po komorama</h3>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "300px" }}>
+          <div className="chart-placeholder">
             <BarChart size={32} />
-            <span style={{ marginLeft: "1rem" }}>Graf će biti implementiran sa pravim podacima</span>
+            <span style={{ marginLeft: "1rem" }}>
+              Graf će biti implementiran sa pravim podacima
+            </span>
           </div>
         </div>
 
         <div className="chart-card">
           <h3>Temperatura po komorama (24h)</h3>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "300px" }}>
+          <div className="chart-placeholder">
             <Thermometer size={32} />
-            <span style={{ marginLeft: "1rem" }}>Graf će biti implementiran sa pravim podacima</span>
+            <span style={{ marginLeft: "1rem" }}>
+              Graf će biti implementiran sa pravim podacima
+            </span>
           </div>
         </div>
       </section>
