@@ -1,28 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  BarChart,
-  PieChart,
-  LineChart,
-  TrendingUp,
-  Package,
-  Users,
   DollarSign,
   ShoppingCart,
+  Package,
+  Users,
+  LineChart,
+  PieChart,
   Star,
-  Award
+  Award,
 } from "lucide-react";
 import "./stats.css";
 
 export default function Stats() {
-  const [selectedPeriod, setSelectedPeriod] = useState("month");
+  const [partners, setPartners] = useState([]);
+  const [orders, setOrders] = useState([]);
 
-  // Mock data - replace with real data from your API
-  const statsData = {
-    totalRevenue: "€245,890",
-    averageOrderValue: "€5,240",
-    totalOrders: "47",
-    activeCustomers: "28",
-  };
+  useEffect(() => {
+    async function fetchPartners() {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/partners`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        setPartners(data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function fetchOrders() {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/documents`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        setOrders(data.data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchPartners();
+    fetchOrders();
+  }, []);
 
   const topProducts = [
     { name: "Jabuke", quantity: "125,000 kg", revenue: "€62,500" },
@@ -42,41 +60,27 @@ export default function Stats() {
         <h1>Statistika i Analitika</h1>
         <p>Detaljan pregled poslovanja, trendova i performansi</p>
       </section>
-
-      <div className="period-selector">
-        <button
-          className={`period-button ${selectedPeriod === "week" ? "active" : ""}`}
-          onClick={() => setSelectedPeriod("week")}
-        >
-          Nedelja
-        </button>
-        <button
-          className={`period-button ${selectedPeriod === "month" ? "active" : ""}`}
-          onClick={() => setSelectedPeriod("month")}
-        >
-          Mesec
-        </button>
-        <button
-          className={`period-button ${selectedPeriod === "quarter" ? "active" : ""}`}
-          onClick={() => setSelectedPeriod("quarter")}
-        >
-          Kvartal
-        </button>
-        <button
-          className={`period-button ${selectedPeriod === "year" ? "active" : ""}`}
-          onClick={() => setSelectedPeriod("year")}
-        >
-          Godina
-        </button>
-      </div>
-
       <div className="stats-grid">
         <div className="stats-card">
           <h3>
             <DollarSign size={20} />
             Ukupan prihod
           </h3>
-          <div className="value">{statsData.totalRevenue}</div>
+          <div className="value">
+            {new Intl.NumberFormat("sr-RS", {
+              style: "currency",
+              currency: "RSD",
+            }).format(
+              orders
+                .filter((order) => order.type === "prodaja")
+                .reduce(
+                  (sum, order) =>
+                    sum +
+                    order.items.reduce((acc, item) => acc + item.total, 0),
+                  0
+                )
+            )}
+          </div>
           <div className="subtitle">+15.8% od prošlog perioda</div>
         </div>
 
@@ -85,7 +89,24 @@ export default function Stats() {
             <ShoppingCart size={20} />
             Prosečna vrednost porudžbine
           </h3>
-          <div className="value">{statsData.averageOrderValue}</div>
+          <div className="value">
+            {new Intl.NumberFormat("sr-RS", {
+              style: "currency",
+              currency: "RSD",
+            }).format(
+              orders.length > 0
+                ? orders
+                    .filter((order) => order.type === "prodaja")
+                    .reduce(
+                      (sum, order) =>
+                        sum +
+                        order.items.reduce((acc, item) => acc + item.total, 0),
+                      0
+                    ) /
+                    orders.filter((order) => order.type === "prodaja").length
+                : 0
+            )}
+          </div>
           <div className="subtitle">+5.3% od prošlog perioda</div>
         </div>
 
@@ -94,7 +115,9 @@ export default function Stats() {
             <Package size={20} />
             Ukupno porudžbina
           </h3>
-          <div className="value">{statsData.totalOrders}</div>
+          <div className="value">
+            {orders.filter((order) => order.type === "prodaja").length}
+          </div>
           <div className="subtitle">+12% od prošlog perioda</div>
         </div>
 
@@ -103,7 +126,9 @@ export default function Stats() {
             <Users size={20} />
             Aktivni partneri
           </h3>
-          <div className="value">{statsData.activeCustomers}</div>
+          <div className="value">
+            {partners.filter((partner) => partner.isActive).length}
+          </div>
           <div className="subtitle">+8% od prošlog perioda</div>
         </div>
       </div>
@@ -141,7 +166,9 @@ export default function Stats() {
               </div>
               <div className="top-item-info">
                 <h4>{product.name}</h4>
-                <p>{product.quantity} | {product.revenue}</p>
+                <p>
+                  {product.quantity} | {product.revenue}
+                </p>
               </div>
             </div>
           ))}
@@ -161,7 +188,9 @@ export default function Stats() {
               </div>
               <div className="top-item-info">
                 <h4>{partner.name}</h4>
-                <p>{partner.orders} porudžbina | {partner.revenue}</p>
+                <p>
+                  {partner.orders} porudžbina | {partner.revenue}
+                </p>
               </div>
             </div>
           ))}

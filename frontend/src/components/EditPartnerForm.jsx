@@ -35,12 +35,13 @@ export default function EditPartnerForm() {
     const accountNumber = formData.get("accountNumber")?.trim();
     const bankName = formData.get("bankName")?.trim();
     const type = formData.get("type")?.trim();
+    const isActive = formData.get("isActive") === "true";
 
     const errors = [];
 
     if (!name || !address || !phone || !pibOrJmbg || !type) {
       errors.push(
-        "Polja 'Ime', 'Adresa', 'Telefon', 'PIB/JMBG' i 'Tip' su obavezna."
+        "Polja 'Ime', 'Adresa', 'Telefon', 'PIB/JMBG' i 'Tip', 'Aktivan' su obavezna."
       );
     }
 
@@ -80,6 +81,7 @@ export default function EditPartnerForm() {
             accountNumber,
             bankName,
             type,
+            isActive,
           }),
         }
       );
