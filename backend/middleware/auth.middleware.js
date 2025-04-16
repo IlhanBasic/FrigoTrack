@@ -3,7 +3,7 @@ const verifyAdmin = (req, res, next) => {
   if (req.user.role !== "admin") {
     return res
       .status(403)
-      .json({ message: "Access denied, admin role required." });
+      .json({ message: "Pristup odbijen, admin uloga potrebna." });
   }
   next();
 };
@@ -12,7 +12,7 @@ const verifyToken = (req, res, next) => {
   if (!token) {
     return res
       .status(401)
-      .json({ message: "Access denied, no token provided." });
+      .json({ message: "Pristup odbijen, token nije prosledjen." });
   }
 
   try {
@@ -22,7 +22,7 @@ const verifyToken = (req, res, next) => {
     next();
   } catch (error) {
     console.log(error)
-    res.status(401).json({ message: "Invalid or expired token." });
+    res.status(401).json({ message: "Nevalidan ili istekao token." });
   }
 };
 export { verifyAdmin, verifyToken };

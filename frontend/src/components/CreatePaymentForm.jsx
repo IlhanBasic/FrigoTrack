@@ -12,7 +12,6 @@ export default function CreatePaymentForm() {
     let userId = "";
     const amountPaid = formData.get("amountPaid");
     const paymentDate = formData.get("paymentDate");
-    const method = formData.get("method");
     const recordedBy = formData.get("recordedBy");
     const documentId = formData.get("documentId");
     const errors = [];
@@ -31,13 +30,6 @@ export default function CreatePaymentForm() {
     if (errors.length > 0) {
       return { errors };
     }
-    console.log({
-      amountPaid,
-      paymentDate,
-      method,
-      recordedBy,
-      documentId,
-    });
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/users/${user}`,
@@ -53,11 +45,11 @@ export default function CreatePaymentForm() {
 
       const userData = await response.json();
       if (!response.ok) {
-        throw new Error(userData.message);
+        toast.error(userData.message);
       }
       userId = userData._id;
     } catch (err) {
-      console.log(err);
+      toast.error(err);
     }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/payments`, {
@@ -68,7 +60,6 @@ export default function CreatePaymentForm() {
         body: JSON.stringify({
           amountPaid,
           paymentDate,
-          method,
           recordedBy: userId,
           document: documentId,
         }),
@@ -79,7 +70,7 @@ export default function CreatePaymentForm() {
       }
       return { errors: await response.json() };
     } catch (err) {
-      console.log(err);
+      toast.error(err);
     }
   }
   useEffect(() => {
@@ -100,13 +91,6 @@ export default function CreatePaymentForm() {
         <div className="form-group">
           <label htmlFor="paymentDate">Datum transakcije:</label>
           <input type="date" id="paymentDate" name="paymentDate" required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="method">Metoda transakcije:</label>
-          <select id="method" name="method" required>
-            <option value="gotovina">Gotovina</option>
-            <option value="račun">Račun</option>
-          </select>
         </div>
         <div className="form-group">
           <label htmlFor="recordedBy">Zabilježio:</label>

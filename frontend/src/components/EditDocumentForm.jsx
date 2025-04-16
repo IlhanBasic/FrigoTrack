@@ -63,9 +63,11 @@ export default function EditDocumentForm() {
       const product = products.find(
         (p) => p.name === selectedProduct && p.variety === selectedVariety
       );
-      console.log(product);
-      if (!product) return; // ako nije pronađen proizvod, prekini
 
+      if (!product) {
+        toast.error("Nije učitan proizvod");
+        return;
+      }
       setDocument((prev) => {
         const items = prev.items || [];
 
@@ -76,7 +78,6 @@ export default function EditDocumentForm() {
         );
 
         if (existingProductIndex !== -1) {
-          // Ažuriraj postojeću stavku
           const updatedItems = [...items];
           updatedItems[existingProductIndex] = {
             ...updatedItems[existingProductIndex],
@@ -89,7 +90,6 @@ export default function EditDocumentForm() {
           return { ...prev, items: updatedItems };
         }
 
-        // Dodaj novu stavku
         const newItem = {
           productId: {
             _id: product._id,
@@ -136,7 +136,6 @@ export default function EditDocumentForm() {
     }
 
     try {
-      console.log(document.items);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/documents/${document._id}`,
         {
@@ -149,8 +148,8 @@ export default function EditDocumentForm() {
             date: document.date,
             partnerId: document.partnerId,
             items: document.items.map((item) => ({
-              _id: item._id, // ako već postoji (za update), zadrži
-              productId: item.productId._id, // koristi samo referencu
+              _id: item._id,
+              productId: item.productId._id,
               quantity: item.quantity,
               pricePerUnit: item.pricePerUnit,
               vatRate: item.vatRate,
@@ -168,7 +167,7 @@ export default function EditDocumentForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
+        toast.error(
           data.message || "Došlo je do greške prilikom izmene dokumenta"
         );
       }
@@ -252,24 +251,6 @@ export default function EditDocumentForm() {
 
         <div className="form-group">
           <label>Stavke:</label>
-          {/* {products.length > 0 && (
-          products.map((item) => (
-            <ul key={item._id}>
-              <li>
-                <span>
-                  {item.product} - {item.variety} - {item.quantity} kg
-                </span>
-                <button
-                  type="button"
-                  className="remove-button"
-                  onClick={() => removeItem(item._id)}
-                >
-                  <Trash />
-                </button>
-              </li>
-            </ul>
-          ))
-        )} */}
           <ul>
             {document.items.length > 0 &&
               document.items.map((item) => (

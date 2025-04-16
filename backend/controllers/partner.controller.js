@@ -13,7 +13,7 @@ export const getPartnerById = async (req, res) => {
   try {
     const partner = await Partner.findById(req.params.id);
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found." });
+      return res.status(404).json({ message: "Partner nije pronadjen." });
     }
     res.status(200).json(partner);
   } catch (error) {
@@ -24,23 +24,21 @@ export const getPartnerById = async (req, res) => {
 export const createPartner = async (req, res) => {
   const { name, address, phone, pibOrJmbg, type } = req.body;
 
-  // Validacija podataka
   if (!name || !address || !phone || !pibOrJmbg || !type) {
     return res
       .status(400)
       .json({
         message:
-          "Missing required fields: name, address, phone, pibOrJmbg, type.",
+          "Nedostaju neka polja: name, address, phone, pibOrJmbg, type.",
       });
   }
 
   try {
-    // Provera da li partner sa istim PIB/JMBG već postoji
     const existingPartner = await Partner.findOne({ pibOrJmbg });
     if (existingPartner) {
       return res
         .status(400)
-        .json({ message: "Partner with this PIB/JMBG already exists." });
+        .json({ message: "Partner sa tim PIB/JMBG već postoji." });
     }
 
     const partner = new Partner(req.body);
@@ -57,7 +55,7 @@ export const updatePartner = async (req, res) => {
       new: true,
     });
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found." });
+      return res.status(404).json({ message: "Partner nije pronadjen." });
     }
     res.status(200).json(partner);
   } catch (error) {
@@ -69,9 +67,9 @@ export const deletePartner = async (req, res) => {
   try {
     const partner = await Partner.findByIdAndDelete(req.params.id);
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found." });
+      return res.status(404).json({ message: "Partner nije pronadjen." });
     }
-    res.status(200).json({ message: "Partner deleted successfully." });
+    res.status(200).json({ message: "Partner je uspešno obrisan." });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

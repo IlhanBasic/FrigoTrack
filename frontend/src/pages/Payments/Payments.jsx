@@ -27,7 +27,7 @@ export default function Payments() {
   }
   return (
     <>
-      <Table items={payments}  type={"placanje"}/>
+      <Table items={payments}  type={"placanja"}/>
     </>
   );
 }

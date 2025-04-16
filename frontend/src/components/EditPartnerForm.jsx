@@ -91,7 +91,7 @@ export default function EditPartnerForm() {
       }
       return { errors: await response.json() };
     } catch (err) {
-      console.log(err);
+      toast.error(err);
       return { errors: err };
     }
   }

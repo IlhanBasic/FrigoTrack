@@ -27,7 +27,7 @@ export default function Documents() {
   }
   return (
     <>
-      <Table items={documents} type={"dokument"} />
+      <Table items={documents} type={"dokumenti"} />
     </>
   );
 }

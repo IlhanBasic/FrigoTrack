@@ -45,7 +45,7 @@ export default function CreateDocumentForm() {
 
       const userData = await userResponse.json();
       if (!userResponse.ok) {
-        throw new Error(userData.message);
+        toast.error(userData.message);
       }
       userId = userData._id;
 
@@ -53,7 +53,7 @@ export default function CreateDocumentForm() {
       const productsData = await productsResponse.json();
       
       if (!productsResponse.ok) {
-        throw new Error(productsData.message);
+        toast.error(productsData.message);
       }
 
       const documentItems = products.map(product => {
@@ -62,7 +62,7 @@ export default function CreateDocumentForm() {
         );
 
         if (!matchingProduct) {
-          throw new Error(`Product not found: ${product.productId} - ${product.varietyId}`);
+          toast.error(`Product not found: ${product.productId} - ${product.varietyId}`);
         }
 
         return {
@@ -108,7 +108,7 @@ export default function CreateDocumentForm() {
         return { errors: [errorData.message] };
       }
     } catch (err) {
-      console.error(err);
+      toast.error(err);
       return { errors: [err.message || "Došlo je do greške pri slanju zahtjeva."] };
     }
   }

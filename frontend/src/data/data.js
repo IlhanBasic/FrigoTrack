@@ -42,7 +42,6 @@ export const TABLEHEADERS = {
   status: "Status",
   amountPaid: "Placeno (RSD)",
   paymentDate: "Datum placanja",
-  method: "Metoda placanja",
 };
 export const VARIETY = {
   malina: ["vilamet", "meeker", "polka", "heritage"],

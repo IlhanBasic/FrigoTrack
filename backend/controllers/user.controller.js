@@ -23,7 +23,7 @@ export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ message: "Korisnik nije pronadjen." });
     }
     res.status(200).json(user);
   } catch (error) {
@@ -34,7 +34,7 @@ export const getUserByUsername = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ message: "Korisnik nije pronadjen." });
     }
     res.status(200).json(user);
   } catch (error) {
@@ -45,16 +45,22 @@ export const getUserByUsername = async (req, res) => {
 export const createUser = async (req, res) => {
   handleValidationErrors(req, res);
 
-  const { username, email, password } = req.body;
+  const { username, email, password, department, role } = req.body;
 
   const userExists = await User.findOne({ email });
   if (userExists) {
-    return res.status(400).json({ message: "Email already in use" });
+    return res.status(400).json({ message: "Email već postoji." });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
+    const user = new User({
+      username,
+      email,
+      password: hashedPassword,
+      role,
+      department,
+    });
     await user.save();
     res.status(201).json(user);
   } catch (error) {
@@ -89,9 +95,8 @@ export const loginUser = async (req, res) => {
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
-    // Return both message AND user data with token
     res.status(200).json({
-      message: "Login successful",
+      message: "Login uspešan.",
       user: {
         id: user._id,
         username: user.username,
@@ -107,24 +112,23 @@ export const loginUser = async (req, res) => {
 
 export const getLoggedInUser = async (req, res) => {
   const token = req.cookies.token;
-  if (!token) return res.status(401).json({ message: "Not logged in" });
+  if (!token) return res.status(401).json({ message: "Nije prijavljen." });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Fetch fresh user data from DB
     const user = await User.findById(decoded.id).select("-password");
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Korisnik nije pronadjen." });
     }
     res.status(200).json({ user });
   } catch (err) {
-    res.status(403).json({ message: "Invalid token" });
+    res.status(403).json({ message: "Nevalidan token." });
   }
 };
 export const logoutUser = async (req, res) => {
   res.clearCookie("token");
-  res.status(200).json({ message: "Logout successful" });
-}
+  res.status(200).json({ message: "Logout uspešan." });
+};
 export const updateUser = async (req, res) => {
   handleValidationErrors(req, res);
 
@@ -133,7 +137,7 @@ export const updateUser = async (req, res) => {
       new: true,
     });
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ message: "Korisnik nije pronadjen." });
     }
     res.status(200).json(user);
   } catch (error) {
@@ -145,9 +149,9 @@ export const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ message: "Korisnik nije pronadjen." });
     }
-    res.status(200).json({ message: "User deleted successfully." });
+    res.status(200).json({ message: "Korisnik obrisan uspešno." });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -155,7 +159,11 @@ export const deleteUser = async (req, res) => {
 export const deleteAllUser = async (req, res) => {
   try {
     const deletedUsers = await User.deleteMany({});
-    res.status(200).json({ message: `${deletedUsers.deletedCount} users deleted successfully.` });
+    res
+      .status(200)
+      .json({
+        message: `${deletedUsers.deletedCount} korisnik/a je uspešno obrisan/o.`,
+      });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

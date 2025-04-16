@@ -7,7 +7,7 @@ import "./register.css";
 import logoImg from "../../assets/logo.png";
 const apiUrl = import.meta.env.VITE_API_URL;
 const ROLES = ["admin", "user"];
-const DEPARTMENTS = ["administracija", "prodaja", "skladiste",undefined];
+const DEPARTMENTS = ["administracija", "prodaja", "skladište",undefined];
 
 export default function Register() {
   const [isAdminRole, setIsAdminRole] = useState(false);
@@ -131,7 +131,7 @@ export default function Register() {
             <label>Vrsta departmana:</label>
             <select name="department">
               <option value="administracija">Administracija</option>
-              <option value="skladiste">Skladiste</option>
+              <option value="skladište">Skladiste</option>
               <option value="prodaja">Prodaja</option>
             </select>
           </div>

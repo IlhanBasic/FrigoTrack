@@ -13,11 +13,11 @@ export default function Search({
 
   function handleChangeUrl() {
     if (
-      type === "partnera" ||
-      type === "proizvod" ||
-      type === "dokument" ||
-      type === "placanje" ||
-      type === "prostor"
+      type === "partneri" ||
+      type === "proizvodi" ||
+      type === "dokumenti" ||
+      type === "placanja" ||
+      type === "prostori"
     ) {
       navigate(`create`);
     }
@@ -27,7 +27,7 @@ export default function Search({
     <div className="search-container">
       <div className="action-group crud-btns">
         <button onClick={handleChangeUrl} className="action-btn btn-create">
-          <Plus /> Dodaj {type}
+          <Plus /> 
         </button>
       </div>
 
@@ -43,10 +43,10 @@ export default function Search({
 
       <div className="action-group pdf-btns">
         <button onClick={exportToPDF} className="action-btn btn-pdf">
-          <Download /> Export PDF
+          <Download /> PDF
         </button>
         <button onClick={exportToExcel} className="action-btn btn-confirm">
-          <Download /> Export Excel
+          <Download /> Excel
         </button>
       </div>
     </div>

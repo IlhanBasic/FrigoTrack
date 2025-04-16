@@ -6,7 +6,7 @@ const validateDocumentData = (data, isUpdate = false) => {
 
   if (!isUpdate || data.type !== undefined) {
     if (!["otkup", "prodaja", "premestaj", "otpis"].includes(data.type)) {
-      errors.type = "Invalid document type";
+      errors.type = "Nevalidan tip dokumenta.";
     }
   }
 
@@ -14,19 +14,19 @@ const validateDocumentData = (data, isUpdate = false) => {
     const prefix = data.type ? data.type.toUpperCase().substring(0, 3) : "";
     const regex = new RegExp(`^${prefix}-\\d{4}-\\d{3}$`);
     if (!regex.test(data.documentNumber)) {
-      errors.documentNumber = `Document number must match format ${prefix}-YYYY-NNN`;
+      errors.documentNumber = `Broj dokumenta mora pratiti format ${prefix}-YYYY-NNN.`;
     }
   }
 
   if (!isUpdate || data.partner !== undefined) {
     if (!data.partner || !mongoose.Types.ObjectId.isValid(data.partner)) {
-      errors.partner = "Valid partner reference is required";
+      errors.partner = "Validna referenca na partnera je neophodna.";
     }
   }
 
   if (data.items && Array.isArray(data.items)) {
     if (data.items.length === 0) {
-      errors.items = "Document must have at least one item";
+      errors.items = "Dokument mora uključivati najmanje jednu stavku.";
     } else {
       data.items.forEach((item, index) => {
         if (
@@ -34,22 +34,22 @@ const validateDocumentData = (data, isUpdate = false) => {
           !mongoose.Types.ObjectId.isValid(item.productId)
         ) {
           errors[`items.${index}.productId`] =
-            "Valid product reference is required";
+            "Validna referenca na proizvod je neophodna.";
         }
         if (item.quantity === undefined || item.quantity <= 0) {
-          errors[`items.${index}.quantity`] = "Valid quantity is required";
+          errors[`items.${index}.quantity`] = "Validna količina je neophodna.";
         }
         if (
           ["otkup", "prodaja"].includes(data.type) &&
           (item.pricePerUnit === undefined || item.pricePerUnit < 0)
         ) {
-          errors[`items.${index}.pricePerUnit`] = "Valid price is required";
+          errors[`items.${index}.pricePerUnit`] = "Validna cena je neophodna.";
         }
         if (
           ["otkup", "prodaja"].includes(data.type) &&
           (item.vatRate === undefined || item.vatRate < 0 || item.vatRate > 100)
         ) {
-          errors[`items.${index}.vatRate`] = "Valid VAT rate is required";
+          errors[`items.${index}.vatRate`] = "Validan PDV % je neophodan.";
         }
       });
     }
@@ -60,19 +60,19 @@ const validateDocumentData = (data, isUpdate = false) => {
       data.transport.driverName &&
       typeof data.transport.driverName !== "string"
     ) {
-      errors["transport.driverName"] = "Driver name must be a string";
+      errors["transport.driverName"] = "Ime vozača mora biti string.";
     }
     if (
       data.transport.vehiclePlate &&
       typeof data.transport.vehiclePlate !== "string"
     ) {
-      errors["transport.vehiclePlate"] = "Vehicle plate must be a string";
+      errors["transport.vehiclePlate"] = "Broj tablica mora biti string.";
     }
     if (
       data.transport.cost !== undefined &&
       (isNaN(data.transport.cost) || data.transport.cost < 0)
     ) {
-      errors["transport.cost"] = "Valid transport cost is required";
+      errors["transport.cost"] = "Validna cena troška prevoza je neophodna.";
     }
   }
 
@@ -80,7 +80,7 @@ const validateDocumentData = (data, isUpdate = false) => {
     data.status &&
     !["u pripremi", "potvrđen", "otpremljen", "storniran"].includes(data.status)
   ) {
-    errors.status = "Invalid document status";
+    errors.status = "Nevalidan status dokumenta.";
   }
 
   return Object.keys(errors).length > 0 ? errors : null;
@@ -113,7 +113,7 @@ export const getAllDocuments = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve documents",
+      message: "Neuspešno preuzimanje dokumenata.",
       error: error.message,
     });
   }
@@ -124,7 +124,7 @@ export const getDocumentById = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid document ID format",
+        message: "Nevalidan ID format.",
       });
     }
 
@@ -136,7 +136,7 @@ export const getDocumentById = async (req, res) => {
     if (!document) {
       return res.status(404).json({
         success: false,
-        message: "Document not found.",
+        message: "Dokument nije pronadjen.",
       });
     }
 
@@ -147,7 +147,7 @@ export const getDocumentById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve document",
+      message: "Neuspešno preuzimanje dokumenta.",
       error: error.message,
     });
   }
@@ -159,7 +159,7 @@ export const createDocument = async (req, res) => {
     if (validationErrors) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija",
         errors: validationErrors,
       });
     }
@@ -171,7 +171,7 @@ export const createDocument = async (req, res) => {
       if (existingDoc) {
         return res.status(400).json({
           success: false,
-          message: "Document with this number already exists",
+          message: "Dokument sa tim brojem već postoji.",
         });
       }
     }
@@ -190,7 +190,7 @@ export const createDocument = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Document created successfully",
+      message: "Document je uspešno kreiran.",
       data: document,
     });
   } catch (error) {
@@ -201,13 +201,13 @@ export const createDocument = async (req, res) => {
       }, {});
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors,
       });
     }
     res.status(500).json({
       success: false,
-      message: "Failed to create document",
+      message: "Neuspešno kreiranje dokumenta.",
       error: error.message,
     });
   }
@@ -218,7 +218,7 @@ export const updateDocument = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid document ID format",
+        message: "Nevalidan Id dokumenta.",
       });
     }
 
@@ -226,7 +226,7 @@ export const updateDocument = async (req, res) => {
     if (validationErrors) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors: validationErrors,
       });
     }
@@ -239,7 +239,7 @@ export const updateDocument = async (req, res) => {
       if (existingDoc) {
         return res.status(400).json({
           success: false,
-          message: "Another document with this number already exists",
+          message: "Neki drugi dokument sa ovim brojem već postoji.",
         });
       }
     }
@@ -259,13 +259,13 @@ export const updateDocument = async (req, res) => {
     if (!document) {
       return res.status(404).json({
         success: false,
-        message: "Document not found.",
+        message: "Dokument nije pronadjen.",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Document updated successfully",
+      message: "Dokument je uspešno izmenjen.",
       data: document,
     });
   } catch (error) {
@@ -276,13 +276,13 @@ export const updateDocument = async (req, res) => {
       }, {});
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors,
       });
     }
     res.status(500).json({
       success: false,
-      message: "Failed to update document",
+      message: "Neuspešna izmena dokumenta.",
       error: error.message,
     });
   }
@@ -293,7 +293,7 @@ export const deleteDocument = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid document ID format",
+        message: "Nevalidan Id dokumenta.",
       });
     }
 
@@ -301,14 +301,14 @@ export const deleteDocument = async (req, res) => {
     if (!document) {
       return res.status(404).json({
         success: false,
-        message: "Document not found.",
+        message: "Dokument nije pronadjen.",
       });
     }
 
     if (document.status === "potvrđen" || document.status === "otpremljen") {
       return res.status(400).json({
         success: false,
-        message: "Confirmed or shipped documents cannot be deleted",
+        message: "Ne možete obrisati potvrđen ili otpremljen dokument.",
       });
     }
 
@@ -316,12 +316,12 @@ export const deleteDocument = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Document deleted successfully.",
+      message: "Dokument je uspešno obrisan.",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to delete document",
+      message: "Neuspešno brisanje dokumenta.",
       error: error.message,
     });
   }

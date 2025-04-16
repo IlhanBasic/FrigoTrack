@@ -11,7 +11,7 @@ export const getMessageById = async (req, res) => {
   try {
     const message = await Messages.findById(req.params.id);
     if (!message) {
-      return res.status(404).json({ message: "Message not found" });
+      return res.status(404).json({ message: "Poruka sa tim id ne postoji." });
     }
     res.status(200).json(message);
   } catch (error) {
@@ -22,7 +22,7 @@ export const getAllMessagesBettwenTwoUsers = async (req, res) => {
   try {
     const { senderId, receiverId } = req.query;
     if (!senderId || !receiverId) {
-      return res.status(400).json({ message: "Missing required fields" });
+      return res.status(400).json({ message: "Nedostaju neophodna polja." });
     }
 
     const messages = await Messages.find({
@@ -43,14 +43,14 @@ export const createMessage = async (req, res) => {
     const { sender, receiver, text } = req.body;
 
     if (!sender || !receiver || !text?.trim()) {
-      return res.status(400).json({ message: "Missing required fields" });
+      return res.status(400).json({ message: "Nedostaju neophodna polja" });
     }
 
     const message = await Messages.create({
       sender,
       receiver,
       text,
-      isRead: false, // default
+      isRead: false,
       timestamp: new Date(),
     });
 

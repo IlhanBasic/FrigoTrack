@@ -9,18 +9,18 @@ import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
 import { useNavigate } from "react-router-dom";
 const TABLES = {
-  partnera: "partners",
-  proizvod: "products",
-  dokument: "documents",
-  placanje: "payments",
-  prostor: "cooldrooms",
+  partneri: "partners",
+  proizvodi: "products",
+  dokumenti: "documents",
+  placanja: "payments",
+  prostori: "cooldrooms",
 };
 export default function Table({ items, type }) {
   const navigate = useNavigate();
   const [term, setTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const tableRef = useRef(null);
-
+  console.log(items);
   const exportToPDF = () => {
     if (!filteredItems.length) return alert("Nema podataka za export.");
 
@@ -214,29 +214,40 @@ export default function Table({ items, type }) {
         <table className="table">
           <thead>
             <tr>
-              {type !== "placanje" && <th>Akcije</th>}
+              {type !== "placanja" && <th>Akcije</th>}
               {headers
                 .filter(
                   (key) =>
-                    typeof items[0][key] !== "object" &&
-                    !["_id", "createdAt", "updatedAt", "__v"].includes(key)
+                    ![
+                      "_id",
+                      "createdAt",
+                      "updatedAt",
+                      "__v",
+                      "method",
+                    ].includes(key) &&
+                    (type === "placanja"
+                      ? true
+                      : typeof items[0][key] !== "object")
                 )
                 .map((key) => (
                   <th onClick={() => handleSort(key)} key={key}>
-                    {TABLEHEADERS[key] || key}
+                    {type === "placanja" && key === "document"
+                      ? "Broj dokumenta"
+                      : TABLEHEADERS[key] || key}
                   </th>
                 ))}
             </tr>
           </thead>
+
           <tbody>
             {filteredItems.map((item, index) => (
               <tr key={item._id || index}>
-                {type === "partnera" ||
-                type === "proizvod" ||
-                type === "prostor" ||
-                type === "dokument" ? (
+                {type === "partneri" ||
+                type === "proizvodi" ||
+                type === "prostori" ||
+                type === "dokumenti" ? (
                   <td className="action-ceil">
-                    {type !== "dokument" && (
+                    {type !== "dokumenti" && (
                       <button
                         className="delete-button"
                         onClick={() => deleteItem(item._id)}
@@ -257,18 +268,30 @@ export default function Table({ items, type }) {
                 {headers
                   .filter(
                     (key) =>
-                      typeof item[key] !== "object" &&
-                      !["_id", "createdAt", "updatedAt", "__v"].includes(key)
+                      typeof item[key] !== "object" ||
+                      (type === "placanja" && key === "document")
+                  )
+                  .filter(
+                    (key) =>
+                      ![
+                        "_id",
+                        "createdAt",
+                        "updatedAt",
+                        "__v",
+                        "method",
+                      ].includes(key)
                   )
                   .map((key) => (
                     <td key={key}>
-                      {[
-                        "date",
-                        "startDate",
-                        "endDate",
-                        "expiryDate",
-                        "paymentDate",
-                      ].includes(key)
+                      {type === "placanja" && key === "document"
+                        ? item.document?.documentNumber || "—"
+                        : [
+                            "date",
+                            "startDate",
+                            "endDate",
+                            "expiryDate",
+                            "paymentDate",
+                          ].includes(key)
                         ? new Intl.DateTimeFormat("hr-HR", {
                             day: "2-digit",
                             month: "2-digit",
@@ -277,7 +300,11 @@ export default function Table({ items, type }) {
                             minute: "2-digit",
                             second: "2-digit",
                           }).format(new Date(item[key]))
-                        : key === "isActive" ? item[key] ? "DA" : "NE" : String(item[key])}
+                        : key === "isActive"
+                        ? item[key]
+                          ? "DA"
+                          : "NE"
+                        : String(item[key])}
                     </td>
                   ))}
               </tr>

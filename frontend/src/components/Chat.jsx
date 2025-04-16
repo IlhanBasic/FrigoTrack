@@ -2,7 +2,7 @@ import "./chat.css";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
-
+import { Send, X } from "lucide-react";
 export default function Chat() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [users, setUsers] = useState([]);
@@ -76,7 +76,7 @@ export default function Chat() {
         setSelectedUser(filtered[0]._id);
       }
     } catch (err) {
-      console.error("Error fetching users:", err);
+      console.error("Error fetching users in chat:", err);
     }
   }, [user.username, selectedUser]);
 
@@ -97,7 +97,7 @@ export default function Chat() {
       if (!res.ok) throw new Error(data.message);
       setMessages(data);
     } catch (err) {
-      console.error("Error fetching messages:", err);
+      console.error("Error fetching messages in chat:", err);
     }
   }, [selectedUser, user._id]);
 
@@ -154,9 +154,9 @@ export default function Chat() {
       )}
       {isChatOpen && (
         <div className="chat-container">
-          <label>Recipient</label>
+          <label>Primalac:</label>
           <button className="chat-close" onClick={handleShowChat}>
-            X
+            <X />
           </button>
           <select
             name="users"
@@ -166,7 +166,7 @@ export default function Chat() {
           >
             {users.map((user) => (
               <option key={user._id} value={user._id}>
-                {user.username}
+                {user.username} - {user.department}
               </option>
             ))}
           </select>
@@ -200,7 +200,7 @@ export default function Chat() {
               onClick={handleSend}
               disabled={!isConnected || !text.trim()}
             >
-              Send
+              <Send />
             </button>
           </div>
         </div>

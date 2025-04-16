@@ -1,7 +1,6 @@
 import Product from "../models/product.model.js";
 import mongoose from "mongoose";
 
-// Helper function for validation
 const validateProductData = (data, isUpdate = false) => {
   const errors = {};
 
@@ -19,7 +18,7 @@ const validateProductData = (data, isUpdate = false) => {
         "višnja",
       ].includes(data.name)
     ) {
-      errors.name = "Valid product name is required";
+      errors.name = "Validno ime proizvoda je neophodno.";
     }
   }
 
@@ -29,7 +28,7 @@ const validateProductData = (data, isUpdate = false) => {
       typeof data.variety !== "string" ||
       data.variety.trim() === ""
     ) {
-      errors.variety = "Variety is required";
+      errors.variety = "Validna vrsta proizvoda je neophodna.";
     }
   }
 
@@ -41,7 +40,7 @@ const validateProductData = (data, isUpdate = false) => {
       data.harvestYear < 2020 ||
       data.harvestYear > currentYear
     ) {
-      errors.harvestYear = `Harvest year must be between 2020 and ${currentYear}`;
+      errors.harvestYear = `Godina berbe mora biti veća od 2020 i manja od ${currentYear}.`;
     }
   }
 
@@ -51,7 +50,7 @@ const validateProductData = (data, isUpdate = false) => {
       isNaN(data.purchasePrice) ||
       data.purchasePrice < 0
     ) {
-      errors.purchasePrice = "Valid purchase price is required";
+      errors.purchasePrice = "Validna nabavna cena je neophodna.";
     }
   }
 
@@ -61,23 +60,19 @@ const validateProductData = (data, isUpdate = false) => {
       isNaN(data.sellingPrice) ||
       data.sellingPrice < 0
     ) {
-      errors.sellingPrice = "Valid selling price is required";
+      errors.sellingPrice = "Validna prodajna cena je neophodna.";
     }
   }
 
-  // SKU format validation if provided
   if (data.sku && !/^[A-Z]{3}-[A-Z]{3}-\d{4}$/.test(data.sku)) {
-    errors.sku = "SKU must be in format XXX-XXX-YYYY";
+    errors.sku = "SKU mora biti u formatu XXX-XXX-YYYY.";
   }
-
-  // Validate prices relationship
   if (data.purchasePrice !== undefined && data.sellingPrice !== undefined) {
     if (data.sellingPrice < data.purchasePrice) {
-      errors.sellingPrice = "Selling price cannot be lower than purchase price";
+      errors.sellingPrice = "Prodajna cena ne može biti manja od nabavne cene.";
     }
   }
 
-  // Quality indicators validation if provided
   if (data.qualityIndicators) {
     if (
       data.qualityIndicators.sugarContent !== undefined &&
@@ -85,21 +80,21 @@ const validateProductData = (data, isUpdate = false) => {
         data.qualityIndicators.sugarContent > 100)
     ) {
       errors["qualityIndicators.sugarContent"] =
-        "Sugar content must be between 0 and 100";
+        "Procenat šećera mora biti između 0 i 100";
     }
 
     if (
       data.qualityIndicators.acidity !== undefined &&
       data.qualityIndicators.acidity < 0
     ) {
-      errors["qualityIndicators.acidity"] = "Acidity cannot be negative";
+      errors["qualityIndicators.acidity"] = "Kiselost ne može biti negativna.";
     }
 
     if (
       data.qualityIndicators.freezingMethod &&
       !["IQF", "block"].includes(data.qualityIndicators.freezingMethod)
     ) {
-      errors["qualityIndicators.freezingMethod"] = "Invalid freezing method";
+      errors["qualityIndicators.freezingMethod"] = "Nevalidan metod zamrzavanja.";
     }
   }
 
@@ -115,7 +110,7 @@ export const getAllProducts = async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to retrieve products",
+      message: "Neuspešno preuzimanje proizvoda.",
       error: error.message,
     });
   }
@@ -124,17 +119,17 @@ export const getAllProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Invalid product ID format" });
+      return res.status(400).json({ message: "Nevalidan ID format za proizvod." });
     }
 
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).json({ message: "Product not found." });
+      return res.status(404).json({ message: "Proizvod nije pronadjen." });
     }
     res.status(200).json(product);
   } catch (error) {
     res.status(500).json({
-      message: "Failed to retrieve product",
+      message: "Neuspešno preuzimanje proizvoda.",
       error: error.message,
     });
   }
@@ -145,17 +140,16 @@ export const createProduct = async (req, res) => {
     const validationErrors = validateProductData(req.body);
     if (validationErrors) {
       return res.status(400).json({
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors: validationErrors,
       });
     }
 
-    // Check for duplicate SKU if provided
     if (req.body.sku) {
       const existingProduct = await Product.findOne({ sku: req.body.sku });
       if (existingProduct) {
         return res.status(400).json({
-          message: "Product with this SKU already exists",
+          message: "Proizvod sa tim sku već postoji.",
         });
       }
     }
@@ -164,23 +158,22 @@ export const createProduct = async (req, res) => {
     await product.save();
 
     res.status(201).json({
-      message: "Product created successfully",
+      message: "Proizvod uspešno kreiran.",
       product,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
-      // Handle mongoose validation errors
       const errors = Object.values(error.errors).reduce((acc, err) => {
         acc[err.path] = err.message;
         return acc;
       }, {});
       return res.status(400).json({
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors,
       });
     }
     res.status(500).json({
-      message: "Failed to create product",
+      message: "Neuspešno kreiran proizvod.",
       error: error.message,
     });
   }
@@ -189,18 +182,17 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Invalid product ID format" });
+      return res.status(400).json({ message: "Nevalidan ID proizvoda." });
     }
 
     const validationErrors = validateProductData(req.body, true);
     if (validationErrors) {
       return res.status(400).json({
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors: validationErrors,
       });
     }
 
-    // Check for duplicate SKU if provided in update
     if (req.body.sku) {
       const existingProduct = await Product.findOne({
         sku: req.body.sku,
@@ -208,7 +200,7 @@ export const updateProduct = async (req, res) => {
       });
       if (existingProduct) {
         return res.status(400).json({
-          message: "Another product with this SKU already exists",
+          message: "Drugi proizvod postoji sa istim sku već.",
         });
       }
     }
@@ -219,27 +211,26 @@ export const updateProduct = async (req, res) => {
     });
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found." });
+      return res.status(404).json({ message: "Proizvod nije pronadjen." });
     }
 
     res.status(200).json({
-      message: "Product updated successfully",
+      message: "Proizvod uspešno azuriran.",
       product,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
-      // Handle mongoose validation errors
       const errors = Object.values(error.errors).reduce((acc, err) => {
         acc[err.path] = err.message;
         return acc;
       }, {});
       return res.status(400).json({
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors,
       });
     }
     res.status(500).json({
-      message: "Failed to update product",
+      message: "Neuspešno azuriranje proizvoda.",
       error: error.message,
     });
   }
@@ -248,21 +239,21 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Invalid product ID format" });
+      return res.status(400).json({ message: "Nevažeći ID format za proizvod" });
     }
 
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
-      return res.status(404).json({ message: "Product not found." });
+      return res.status(404).json({ message: "Proizvod nije pronadjen." });
     }
 
     res.status(200).json({
-      message: "Product deleted successfully.",
+      message: "Proizvod je obrisan.",
       deletedProduct: product,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Failed to delete product",
+      message: "Neuspešno brisanje proizvoda.",
       error: error.message,
     });
   }

@@ -21,7 +21,7 @@ export default function EditColdRoomForm() {
         const data = await res.json();
         setSelectedColdRoom(data.data);
       } catch (err) {
-        console.log(err);
+        toast.error(err);
       }
     }
     fetchColdRoom();
@@ -82,7 +82,7 @@ export default function EditColdRoomForm() {
       }
       return { errors: await response.json() };
     } catch (err) {
-      console.log(err);
+      toast.error(err);
       return { errors: err };
     }
   }

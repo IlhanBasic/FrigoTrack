@@ -7,7 +7,7 @@ const validatePaymentData = (data, isUpdate = false) => {
 
   if (!isUpdate || data.document !== undefined) {
     if (!data.document || !mongoose.Types.ObjectId.isValid(data.document)) {
-      errors.document = "Valid document reference is required";
+      errors.document = "Validna referenca na dokument je neophodna.";
     }
   }
 
@@ -17,27 +17,21 @@ const validatePaymentData = (data, isUpdate = false) => {
       isNaN(data.amountPaid) ||
       data.amountPaid <= 0
     ) {
-      errors.amountPaid = "Valid payment amount is required";
+      errors.amountPaid = "Validan iznos plaćanja je neophodan.";
     }
   }
 
   if (data.paymentDate) {
     const paymentDate = new Date(data.paymentDate);
     if (isNaN(paymentDate.getTime())) {
-      errors.paymentDate = "Valid payment date is required";
+      errors.paymentDate = "Validan datum plaćanja je neophodan.";
     } else if (paymentDate > new Date()) {
-      errors.paymentDate = "Payment date cannot be in the future";
-    }
-  }
-
-  if (!isUpdate || data.method !== undefined) {
-    if (data.method && !["gotovina", "račun"].includes(data.method)) {
-      errors.method = "Valid payment method is required";
+      errors.paymentDate = "Plaćanje ne može biti u budućnosti.";
     }
   }
 
   if (data.recordedBy && !mongoose.Types.ObjectId.isValid(data.recordedBy)) {
-    errors.recordedBy = "Valid user reference is required";
+    errors.recordedBy = "Validna referenca na korisnika je neophodna.";
   }
 
   return Object.keys(errors).length > 0 ? errors : null;
@@ -74,7 +68,7 @@ export const getAllPayments = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve payments",
+      message: "Neuspešno preuzimanje plaćanja.",
       error: error.message,
     });
   }
@@ -85,7 +79,7 @@ export const getPaymentById = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid payment ID format",
+        message: "Nevalidan ID format.",
       });
     }
 
@@ -96,7 +90,7 @@ export const getPaymentById = async (req, res) => {
     if (!payment) {
       return res.status(404).json({
         success: false,
-        message: "Payment not found.",
+        message: "Plaćanje nije pronađeno.",
       });
     }
 
@@ -107,7 +101,7 @@ export const getPaymentById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve payment",
+      message: "Neuspešno preuzimanje plaćanja.",
       error: error.message,
     });
   }
@@ -119,7 +113,7 @@ export const createPayment = async (req, res) => {
     if (validationErrors) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors: validationErrors,
       });
     }
@@ -128,7 +122,7 @@ export const createPayment = async (req, res) => {
     if (!document) {
       return res.status(404).json({
         success: false,
-        message: "Referenced document not found",
+        message: "Dokument nije pronađen.",
       });
     }
 
@@ -142,7 +136,7 @@ export const createPayment = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Payment created successfully",
+      message: "Uspеšno kreiranje plaćanja.",
       data: payment,
     });
   } catch (error) {
@@ -153,13 +147,13 @@ export const createPayment = async (req, res) => {
       }, {});
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija",
         errors,
       });
     }
     res.status(500).json({
       success: false,
-      message: "Failed to create payment",
+      message: "Neuspešno kreiranje plaćanja",
       error: error.message,
     });
   }
@@ -170,7 +164,7 @@ export const updatePayment = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid payment ID format",
+        message: "Nevalidan ID format.",
       });
     }
 
@@ -178,7 +172,7 @@ export const updatePayment = async (req, res) => {
     if (validationErrors) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors: validationErrors,
       });
     }
@@ -188,7 +182,7 @@ export const updatePayment = async (req, res) => {
       if (!document) {
         return res.status(404).json({
           success: false,
-          message: "Referenced document not found",
+          message: "Dokument nije pronađen.",
         });
       }
     }
@@ -201,13 +195,13 @@ export const updatePayment = async (req, res) => {
     if (!payment) {
       return res.status(404).json({
         success: false,
-        message: "Payment not found.",
+        message: "Plaćanje nije pronađeno.",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Payment updated successfully",
+      message: "Uspеšno azuriranje plaćanja.",
       data: payment,
     });
   } catch (error) {
@@ -218,13 +212,13 @@ export const updatePayment = async (req, res) => {
       }, {});
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors,
       });
     }
     res.status(500).json({
       success: false,
-      message: "Failed to update payment",
+      message: "Neuspešno azuriranje plaćanja.",
       error: error.message,
     });
   }
@@ -235,7 +229,7 @@ export const deletePayment = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid payment ID format",
+        message: "Nevalidan ID format.",
       });
     }
 
@@ -244,13 +238,13 @@ export const deletePayment = async (req, res) => {
     if (!payment) {
       return res.status(404).json({
         success: false,
-        message: "Payment not found.",
+        message: "Plaćanje nije pronađeno.",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Payment deleted successfully.",
+      message: "Uspеšno brisanje plaćanja.",
       data: {
         id: payment._id,
         amount: payment.amountPaid,
@@ -260,7 +254,7 @@ export const deletePayment = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to delete payment",
+      message: "Neuspešno brisanje plaćanja.",
       error: error.message,
     });
   }

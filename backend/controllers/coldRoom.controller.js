@@ -5,13 +5,13 @@ const validateColdRoomData = (data) => {
   const errors = {};
 
   if (!data.roomNumber || typeof data.roomNumber !== "string") {
-    errors.roomNumber = "Valid room number is required";
+    errors.roomNumber = "Validna komora je potrebna.";
   }
 
   if (data.temperature === undefined || typeof data.temperature !== "number") {
-    errors.temperature = "Valid temperature value is required";
+    errors.temperature = "Validna temperatura je neophodna.";
   } else if (data.temperature > 0) {
-    errors.temperature = "Temperature must be below 0°C for cold rooms";
+    errors.temperature = "Temperatura mora biti manja od nule.";
   }
 
   if (
@@ -19,15 +19,15 @@ const validateColdRoomData = (data) => {
     typeof data.capacityKg !== "number" ||
     data.capacityKg <= 0
   ) {
-    errors.capacityKg = "Valid capacity in kg is required";
+    errors.capacityKg = "Validan kapacitet je neophodan.";
   }
 
   if (!data.location || typeof data.location !== "string") {
-    errors.location = "Valid location is required";
+    errors.location = "Validna lokacija je neophodna.";
   }
 
   if (!data.type || !["standard", "shock freezer"].includes(data.type)) {
-    errors.type = "Valid type (standard or shock freezer) is required";
+    errors.type = "Validan tip (standard ili shock freezer) je neophodan.";
   }
 
   return Object.keys(errors).length > 0 ? errors : null;
@@ -55,7 +55,7 @@ export const getAllColdRooms = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve cold rooms",
+      message: "Neuspelo preuzimanje komora.",
       error: error.message,
     });
   }
@@ -66,7 +66,7 @@ export const getColdRoomById = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid cold room ID format",
+        message: "Nevalidan ID komore.",
       });
     }
 
@@ -74,7 +74,7 @@ export const getColdRoomById = async (req, res) => {
     if (!coldRoom) {
       return res.status(404).json({
         success: false,
-        message: "Cold room not found.",
+        message: "Komora nije pronadjena.",
       });
     }
 
@@ -85,7 +85,7 @@ export const getColdRoomById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve cold room",
+      message: "Neuspelo preuzimanje komora.",
       error: error.message,
     });
   }
@@ -96,7 +96,7 @@ export const createColdRoom = async (req, res) => {
   if (validationErrors) {
     return res.status(400).json({
       success: false,
-      message: "Validation failed",
+      message: "Neuspešna validacija.",
       errors: validationErrors,
     });
   }
@@ -108,7 +108,7 @@ export const createColdRoom = async (req, res) => {
     if (existingColdRoom) {
       return res.status(400).json({
         success: false,
-        message: "Cold room with this room number already exists.",
+        message: "Komora sa tim brojem već postoji.",
       });
     }
 
@@ -121,7 +121,7 @@ export const createColdRoom = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Cold room created successfully",
+      message: "Komora je uspešno kreirana.",
       data: coldRoom,
     });
   } catch (error) {
@@ -132,13 +132,13 @@ export const createColdRoom = async (req, res) => {
       }, {});
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspela validacija.",
         errors,
       });
     }
     res.status(500).json({
       success: false,
-      message: "Failed to create cold room",
+      message: "Neuspešno kreiranje komore.",
       error: error.message,
     });
   }
@@ -149,14 +149,14 @@ export const updateColdRoom = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid cold room ID format",
+        message: "Broj komore nije validan ID format.",
       });
     }
 
     if (req.body.roomNumber) {
       return res.status(400).json({
         success: false,
-        message: "Room number cannot be changed",
+        message: "Komora ne može biti promenjena.",
       });
     }
 
@@ -168,13 +168,13 @@ export const updateColdRoom = async (req, res) => {
     if (!coldRoom) {
       return res.status(404).json({
         success: false,
-        message: "Cold room not found.",
+        message: "Komora nije pronadjena.",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Cold room updated successfully",
+      message: "Komora uspešno promenjena.",
       data: coldRoom,
     });
   } catch (error) {
@@ -185,13 +185,13 @@ export const updateColdRoom = async (req, res) => {
       }, {});
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: "Neuspešna validacija.",
         errors,
       });
     }
     res.status(500).json({
       success: false,
-      message: "Failed to update cold room",
+      message: "Neuspešna izmena komore.",
       error: error.message,
     });
   }
@@ -202,7 +202,7 @@ export const deleteColdRoom = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid cold room ID format",
+        message: "Nevalidni broj komore",
       });
     }
 
@@ -212,7 +212,7 @@ export const deleteColdRoom = async (req, res) => {
     if (coldRoomInUse) {
       return res.status(400).json({
         success: false,
-        message: "Cannot delete cold room with assigned products",
+        message: "Nemoguće je izbrisati komoru sa dodeljenim proizvodima.",
       });
     }
 
@@ -220,13 +220,13 @@ export const deleteColdRoom = async (req, res) => {
     if (!coldRoom) {
       return res.status(404).json({
         success: false,
-        message: "Cold room not found.",
+        message: "Komora nije pronadjena.",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Cold room deleted successfully.",
+      message: "Komora uspešno obrisana.",
       data: {
         id: coldRoom._id,
         roomNumber: coldRoom.roomNumber,
@@ -235,7 +235,7 @@ export const deleteColdRoom = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to delete cold room",
+      message: "Neuspešno brisanje komore.",
       error: error.message,
     });
   }

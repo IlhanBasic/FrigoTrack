@@ -55,7 +55,7 @@ export default function CreateProductForm() {
       }
       return { errors: await response.json() };
     } catch (err) {
-      console.log(err);
+      toast.error(err);
     }
   }
   const [formState, formAction] = useActionState(createProductAction, {

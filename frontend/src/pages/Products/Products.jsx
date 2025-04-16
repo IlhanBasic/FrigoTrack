@@ -27,7 +27,7 @@ export default function Products() {
   }
   return (
     <>
-      <Table items={products} type={"proizvod"} />
+      <Table items={products} type={"proizvodi"} />
     </>
   );
 }
