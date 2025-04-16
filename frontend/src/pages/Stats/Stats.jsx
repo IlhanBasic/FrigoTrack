@@ -123,7 +123,7 @@ const SalesCharts = ({ documents }) => {
 export default function Stats() {
   const [partners, setPartners] = useState([]);
   const [orders, setOrders] = useState([]);
-
+  const [products, setProducts] = useState([]);
   useEffect(() => {
     async function fetchPartners() {
       try {
@@ -146,9 +146,19 @@ export default function Stats() {
         console.log(err);
       }
     }
-
+    async function fetchProducts() {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/products`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        setProducts(data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
     fetchPartners();
     fetchOrders();
+    fetchProducts();
   }, []);
 
   const topProducts = [
@@ -157,29 +167,43 @@ export default function Stats() {
     { name: "Višnje", quantity: "95,000 kg", revenue: "€47,500" },
   ];
 
-  const topPartners = [
-    { name: "Fruit d.o.o.", orders: "15", revenue: "€85,000" },
-    { name: "Fresh Export", orders: "12", revenue: "€65,000" },
-    { name: "Agro Trgovina", orders: "8", revenue: "€45,000" },
-  ];
   const partnerStats = partners.map((partner) => {
     const currentPartnerDocuments = orders.filter(
       (doc) => doc.partner._id === partner._id
     );
-  
+
     const revenue = currentPartnerDocuments.reduce((acc, doc) => {
       const docTotal = doc.items.reduce((sum, item) => sum + item.total, 0);
       return acc + docTotal;
     }, 0);
-  
+
     return {
-      partner: partner.name,
+      name: partner.name,
       pibOrJmbg: partner.pibOrJmbg,
-      countDocuments: currentPartnerDocuments.length,
+      orders: currentPartnerDocuments.length,
       revenue,
     };
   });
-  
+  const productStats = products.map((product) => {
+    let totalQuantity = 0;
+    let totalRevenue = 0;
+
+    orders.forEach((doc) => {
+      doc.items.forEach((item) => {
+        if (item.productId._id === product._id) {
+          totalQuantity += item.quantity;
+          totalRevenue += item.total;
+        }
+      });
+    });
+
+    return {
+      name: `${product.name} - ${product.variety}`,
+      quantity: totalQuantity,
+      revenue: totalRevenue,
+    };
+  });
+
   return (
     <div className="stats-container">
       <section className="stats-header">
@@ -267,19 +291,26 @@ export default function Stats() {
           Najprodavaniji proizvodi
         </h3>
         <div className="top-items">
-          {topProducts.map((product, index) => (
-            <div key={index} className="top-item">
-              <div className="top-item-icon">
-                <Package size={20} />
+          {productStats
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 3)
+            .map((product, index) => (
+              <div key={index} className="top-item">
+                <div className="top-item-icon">
+                  <Package size={20} />
+                </div>
+                <div className="top-item-info">
+                  <h4>{product.name}</h4>
+                  <p>
+                    {(product.quantity / 1000.0).toFixed(2)} T |{" "}
+                    {new Intl.NumberFormat("sr-RS", {
+                      style: "currency",
+                      currency: "RSD",
+                    }).format(product.revenue)}
+                  </p>
+                </div>
               </div>
-              <div className="top-item-info">
-                <h4>{product.name}</h4>
-                <p>
-                  {product.quantity} | {product.revenue}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
 
@@ -293,18 +324,22 @@ export default function Stats() {
             .sort((a, b) => b.revenue - a.revenue)
             .slice(0, 3)
             .map((partner, index) => (
-            <div key={index} className="top-item">
-              <div className="top-item-icon">
-                <Users size={20} />
+              <div key={index} className="top-item">
+                <div className="top-item-icon">
+                  <Users size={20} />
+                </div>
+                <div className="top-item-info">
+                  <h4>{partner.name}</h4>
+                  <p>
+                    {partner.orders} porudžbina |{" "}
+                    {new Intl.NumberFormat("sr-RS", {
+                      style: "currency",
+                      currency: "RSD",
+                    }).format(partner.revenue)}
+                  </p>
+                </div>
               </div>
-              <div className="top-item-info">
-                <h4>{partner.partner}</h4>
-                <p>
-                  {partner.countDocuments} porudžbina | {new Intl.NumberFormat('sr-RS', { style: 'currency', currency: 'RSD' }).format(partner.revenue)}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
