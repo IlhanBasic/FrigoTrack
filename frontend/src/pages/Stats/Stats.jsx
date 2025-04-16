@@ -162,7 +162,24 @@ export default function Stats() {
     { name: "Fresh Export", orders: "12", revenue: "€65,000" },
     { name: "Agro Trgovina", orders: "8", revenue: "€45,000" },
   ];
-
+  const partnerStats = partners.map((partner) => {
+    const currentPartnerDocuments = orders.filter(
+      (doc) => doc.partner._id === partner._id
+    );
+  
+    const revenue = currentPartnerDocuments.reduce((acc, doc) => {
+      const docTotal = doc.items.reduce((sum, item) => sum + item.total, 0);
+      return acc + docTotal;
+    }, 0);
+  
+    return {
+      partner: partner.name,
+      pibOrJmbg: partner.pibOrJmbg,
+      countDocuments: currentPartnerDocuments.length,
+      revenue,
+    };
+  });
+  
   return (
     <div className="stats-container">
       <section className="stats-header">
@@ -272,15 +289,18 @@ export default function Stats() {
           Najbolji poslovni partneri
         </h3>
         <div className="top-items">
-          {topPartners.map((partner, index) => (
+          {partnerStats
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 3)
+            .map((partner, index) => (
             <div key={index} className="top-item">
               <div className="top-item-icon">
                 <Users size={20} />
               </div>
               <div className="top-item-info">
-                <h4>{partner.name}</h4>
+                <h4>{partner.partner}</h4>
                 <p>
-                  {partner.orders} porudžbina | {partner.revenue}
+                  {partner.countDocuments} porudžbina | {new Intl.NumberFormat('sr-RS', { style: 'currency', currency: 'RSD' }).format(partner.revenue)}
                 </p>
               </div>
             </div>
