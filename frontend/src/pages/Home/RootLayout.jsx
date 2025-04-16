@@ -5,6 +5,7 @@ import { Outlet } from "react-router-dom";
 import { authActions } from "../../store/auth-slice";
 import BtnToTop from "../../components/BtnToTop";
 import Navbar from "../../components/Navbar";
+import Chat from "../../components/Chat";
 const api_url = import.meta.env.VITE_API_URL;
 
 export default function RootLayout() {
@@ -61,6 +62,7 @@ export default function RootLayout() {
     <>
       <Navbar />
       <Outlet />
+      <Chat />
       <BtnToTop />
     </>
   );
