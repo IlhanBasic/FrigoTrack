@@ -9,6 +9,7 @@ import partnerRoute from './routes/partner.route.js';
 import productRoute from './routes/product.route.js';
 import documentRoute from './routes/document.route.js';
 import paymentRoute from './routes/payment.route.js';
+import messageRoute from './routes/message.route.js';
 const app = express();
 dotenv.config();
 app.use(cookies());
@@ -23,6 +24,7 @@ app.use('/api/partners', partnerRoute);
 app.use('/api/products', productRoute);
 app.use('/api/documents', documentRoute);
 app.use('/api/payments', paymentRoute);
+app.use('/api/messages', messageRoute);
 app.listen(process.env.PORT, () => {
     console.log('Server is running on port 5000');
     connectDB();

@@ -13,6 +13,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
+import Chat from "../../components/Chat";
 
 export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState("all");
@@ -296,6 +297,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <Chat />
     </div>
   );
 }
