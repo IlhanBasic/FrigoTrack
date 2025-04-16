@@ -179,7 +179,6 @@ export default function CreateDocumentForm() {
             </option>
             <option value="otkup">Otkup</option>
             <option value="prodaja">Prodaja</option>
-            <option value="premestaj">Premestaj</option>
             <option value="otpis">Otpis</option>
           </select>
         </div>

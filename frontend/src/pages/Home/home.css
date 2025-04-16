@@ -185,3 +185,6 @@
       grid-template-columns: 1fr;
     }
   }
+  .username{
+    color: #2c3741;
+  }

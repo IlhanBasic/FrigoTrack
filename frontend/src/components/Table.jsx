@@ -174,6 +174,7 @@ export default function Table({ items, type }) {
 
   const headers = Object.keys(items[0]);
   async function deleteItem(id) {
+    if (!window.confirm("Da li ste sigurni da zelite obrisati?")) return;
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/${TABLES[type]}/${id}`,
@@ -276,7 +277,7 @@ export default function Table({ items, type }) {
                             minute: "2-digit",
                             second: "2-digit",
                           }).format(new Date(item[key]))
-                        : String(item[key])}
+                        : key === "isActive" ? item[key] ? "DA" : "NE" : String(item[key])}
                     </td>
                   ))}
               </tr>

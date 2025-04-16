@@ -1,15 +1,124 @@
 import { useEffect, useState } from "react";
 import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
   DollarSign,
   ShoppingCart,
   Package,
   Users,
-  LineChart,
-  PieChart,
+  LineChart as LineChartIcon,
+  PieChart as PieChartIcon,
   Star,
   Award,
 } from "lucide-react";
 import "./stats.css";
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+const SalesCharts = ({ documents }) => {
+  const salesDocs = documents.filter((doc) => doc.type === "prodaja");
+
+  const lineChartData = [];
+
+  salesDocs.forEach((doc) => {
+    const date = new Date(doc.date).toLocaleDateString();
+    doc.items.forEach((item) => {
+      const existing = lineChartData.find((d) => d.date === date);
+      if (existing) {
+        existing.total += item.total;
+      } else {
+        lineChartData.push({ date, total: item.total });
+      }
+    });
+  });
+
+  lineChartData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const pieDataMap = {};
+
+  salesDocs.forEach((doc) => {
+    doc.items.forEach((item) => {
+      const key = `${item.productId.name} (${item.productId.variety})`;
+      if (pieDataMap[key]) {
+        pieDataMap[key] += item.total;
+      } else {
+        pieDataMap[key] = item.total;
+      }
+    });
+  });
+
+  const pieChartData = Object.entries(pieDataMap).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  return (
+    <>
+      <div className="chart-container">
+        <h3 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <LineChartIcon size={20} />
+          Trend prodaje po proizvodima
+        </h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={lineChartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="total"
+              name="Ukupan prihod"
+              stroke="#8884d8"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="chart-container">
+        <h3 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <PieChartIcon size={20} />
+          Raspodela prihoda po proizvodima
+        </h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={pieChartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              fill="#8884d8"
+              label
+            >
+              {pieChartData.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </>
+  );
+};
 
 export default function Stats() {
   const [partners, setPartners] = useState([]);
@@ -133,25 +242,7 @@ export default function Stats() {
         </div>
       </div>
 
-      <div className="chart-container">
-        <h3>
-          <LineChart size={20} />
-          Trend prodaje po proizvodima
-        </h3>
-        <div className="chart-placeholder">
-          Ovde će biti prikazan linijski grafikon trenda prodaje
-        </div>
-      </div>
-
-      <div className="chart-container">
-        <h3>
-          <PieChart size={20} />
-          Raspodela prihoda po proizvodima
-        </h3>
-        <div className="chart-placeholder">
-          Ovde će biti prikazan pie chart raspodele prihoda
-        </div>
-      </div>
+      <SalesCharts documents={orders} />
 
       <div className="chart-container">
         <h3>

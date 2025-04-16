@@ -66,7 +66,7 @@ export default function Navbar() {
               end
               onClick={() => isSmallScreen && setIsMenuOpen(false)}
             >
-              Hladnjače
+              Komore
             </NavLink>
           </li>
           <li>

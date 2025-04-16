@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react";
-import { BarChart, TrendingUp, TrendingDown, Thermometer } from "lucide-react";
+import { TrendingUp, TrendingDown, Thermometer } from "lucide-react";
 import "./home.css";
 import { useSelector } from "react-redux";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
 
 export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState("all");
@@ -93,11 +104,22 @@ export default function Home() {
     }
     setSupplies(filtered);
   }
+  const coldRoomUsageData = coldRooms.map((room) => ({
+    name: room.roomNumber,
+    used: room.currentLoadKg,
+    free: room.capacityKg - room.currentLoadKg,
+  }));
+  const temperatureData = coldRooms.map((room) => ({
+    name: room.roomNumber,
+    temperature: room.temperature,
+  }));
 
   return (
     <div className="home-container">
       <section className="welcome-section">
-        <h1>Dobrodošli {user.username}</h1>
+        <h1>
+          Dobrodošli <span className="username">{user.username}</span>
+        </h1>
         <p>Pregled trenutnog stanja, zaliha i metrika</p>
       </section>
 
@@ -151,7 +173,11 @@ export default function Home() {
               currency: "RSD",
             }).format(
               documents
-                .filter((doc) => doc.type === "prodaja" && new Date() - new Date(doc.date) <= 30 * 24 * 60 * 60 * 1000)
+                .filter(
+                  (doc) =>
+                    doc.type === "prodaja" &&
+                    new Date() - new Date(doc.date) <= 30 * 24 * 60 * 60 * 1000
+                )
                 .reduce(
                   (acc, doc) =>
                     acc + doc.items.reduce((acc, item) => acc + item.total, 0),
@@ -236,21 +262,37 @@ export default function Home() {
       <section className="chart-section">
         <div className="chart-card">
           <h3>Iskorišćenost kapaciteta po komorama</h3>
-          <div className="chart-placeholder">
-            <BarChart size={32} />
-            <span style={{ marginLeft: "1rem" }}>
-              Graf će biti implementiran sa pravim podacima
-            </span>
+          <div style={{ width: "100%", height: 300 }}>
+            <ResponsiveContainer>
+              <BarChart data={coldRoomUsageData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="used" fill="#8884d8" name="Zauzeto (kg)" />
+                <Bar dataKey="free" fill="#82ca9d" name="Slobodno (kg)" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         <div className="chart-card">
-          <h3>Temperatura po komorama (24h)</h3>
-          <div className="chart-placeholder">
-            <Thermometer size={32} />
-            <span style={{ marginLeft: "1rem" }}>
-              Graf će biti implementiran sa pravim podacima
-            </span>
+          <h3>Trenutna temperatura po komorama</h3>
+          <div style={{ width: "100%", height: 300 }}>
+            <ResponsiveContainer>
+              <LineChart data={temperatureData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis domain={[-30, 10]} />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="temperature"
+                  stroke="#8884d8"
+                  name="Temperatura (°C)"
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </section>
