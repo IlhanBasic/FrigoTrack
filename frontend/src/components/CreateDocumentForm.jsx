@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import "./form.css";
-import { VARIETY, PRODUCTS } from "../data/data.js";
 import { Trash, Plus } from "lucide-react";
 
 export default function CreateDocumentForm() {
@@ -18,7 +17,14 @@ export default function CreateDocumentForm() {
   const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
   const [typeDocument, setTypeDocument] = useState("otkup");
-
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/partners`)
+      .then((res) => res.json())
+      .then((data) => setPartners(data));
+    fetch(`${import.meta.env.VITE_API_URL}/products`)
+      .then((res) => res.json())
+      .then((data) => setItems(data));
+  }, []);
   async function createDocumentAction(prevFormState, formData) {
     let userId = "";
     const type = formData.get("type");
@@ -120,15 +126,6 @@ export default function CreateDocumentForm() {
   const [formState, formAction] = useActionState(createDocumentAction, {
     errors: null,
   });
-
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/partners`)
-      .then((res) => res.json())
-      .then((data) => setPartners(data));
-    fetch(`${import.meta.env.VITE_API_URL}/products`)
-      .then((res) => res.json())
-      .then((data) => setItems(data));
-  }, []);
 
   function addItem() {
     if (selectedProduct && selectedVariety && quantity) {
@@ -242,9 +239,9 @@ export default function CreateDocumentForm() {
                 value={selectedProduct}
               >
                 <option value="">-- Izaberite proizvod --</option>
-                {PRODUCTS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
+                {items.map((item) => (
+                  <option key={item.name} value={item.name}>
+                    {item.name}
                   </option>
                 ))}
               </select>
@@ -260,10 +257,11 @@ export default function CreateDocumentForm() {
                 disabled={!selectedProduct}
               >
                 <option value="">-- Izaberite tip --</option>
-                {selectedProduct &&
-                  VARIETY[selectedProduct]?.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
+                {items
+                  .filter((item) => item.name === selectedProduct)
+                  .map((item) => (
+                    <option key={item.variety} value={item.variety}>
+                      {item.variety}
                     </option>
                   ))}
               </select>

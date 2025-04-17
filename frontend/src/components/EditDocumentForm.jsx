@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { PRODUCTS, VARIETY } from "../data/data";
 import { Trash, Plus } from "lucide-react";
 import { useSelector } from "react-redux";
 import "./form.css";
@@ -140,6 +139,55 @@ export default function EditDocumentForm() {
     }
 
     try {
+      if (document.type === "otkup") {
+        const nabavkaResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/products/buy`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              documentId: document._id,
+              items: document.items.map((item) => ({
+                productId: item.productId._id,
+                quantity: item.quantity,
+              })),
+            }),
+          }
+        );
+
+        if (!nabavkaResponse.ok) {
+          const errData = await nabavkaResponse.json();
+          toast.error(errData.message || "Greška pri slanju nabavke");
+          return;
+        }
+      }
+
+      if (document.type === "prodaja") {
+        const prodajaResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/products/sell`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              documentId: document._id,
+              items: document.items.map((item) => ({
+                productId: item.productId._id,
+                quantity: item.quantity,
+              })),
+            }),
+          }
+        );
+
+        if (!prodajaResponse.ok) {
+          const errData = await prodajaResponse.json();
+          toast.error(errData.message || "Greška pri slanju prodaje");
+          return;
+        }
+      }
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/documents/${document._id}`,
         {
@@ -172,6 +220,7 @@ export default function EditDocumentForm() {
         toast.error(
           data.message || "Došlo je do greške prilikom izmene dokumenta"
         );
+        return;
       }
 
       toast.success("Dokument je uspešno izmenjen");
@@ -257,9 +306,9 @@ export default function EditDocumentForm() {
                 value={selectedProduct}
               >
                 <option value="">-- Izaberite proizvod --</option>
-                {PRODUCTS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
+                {products.map((item) => (
+                  <option key={item.name} value={item.name}>
+                    {item.name}
                   </option>
                 ))}
               </select>
@@ -275,10 +324,9 @@ export default function EditDocumentForm() {
                 disabled={!selectedProduct}
               >
                 <option value="">-- Izaberite tip --</option>
-                {selectedProduct &&
-                  VARIETY[selectedProduct]?.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
+                  {products.filter((item) => item.name === selectedProduct).map((item) => (
+                    <option key={item.variety} value={item.variety}>
+                      {item.variety}
                     </option>
                   ))}
               </select>

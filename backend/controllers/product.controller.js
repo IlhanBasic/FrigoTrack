@@ -402,3 +402,58 @@ export const storeProductInColdRoom = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+export const sellingProducts = async (req, res) => {
+  // implementirati
+  try {
+    const { items } = req.body;
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      const coldroom = await ColdRoom.findById(product.coldRooms[0].coldRoom);
+      if (!product) {
+        return res.status(404).json({ message: "Nije pronadjen proizvod." });
+      }
+      if (!coldroom) {
+        return res.status(404).json({ message: "Nije pronadjena komora." });
+      }
+      if (
+        product.currentStockKg < item.quantity ||
+        coldroom.currentLoadKg < item.quantity
+      ) {
+        return res.status(400).json({ message: "Nema dovoljno proizvoda." });
+      }
+      product.currentStockKg -= item.quantity;
+      coldroom.currentLoadKg -= item.quantity;
+      await product.save();
+      await coldroom.save();
+      res.status(200).json({ message: "Proizvod uspešno prodat." });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Greška na serveru", error: err.message });
+  }
+};
+
+export const buyingProducts = async (req, res) => {
+  //implementirati
+  try {
+    const { items } = req.body;
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      const coldroom = await ColdRoom.findById(product.coldRooms[0].coldRoom);
+      if (!product) {
+        return res.status(404).json({ message: "Nije pronadjen proizvod." });
+      }
+      if (!coldroom) {
+        return res.status(404).json({ message: "Nije pronadjena komora." });
+      }
+      product.currentStockKg += item.quantity;
+      coldroom.currentLoadKg += item.quantity;
+      await product.save();
+      await coldroom.save();
+      res.status(200).json({ message: "Proizvod uspešno kupljen." });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Greška na serveru", error: err.message });
+  }
+};
