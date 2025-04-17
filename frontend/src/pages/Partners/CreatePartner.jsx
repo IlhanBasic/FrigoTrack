@@ -1,5 +1,5 @@
 import CreatePartnerForm from "../../components/CreatePartnerForm";
-import './createpartner.css';
+import './partner.css';
 export default function CreatePartner() {
   return (
     <div className="create-partner">

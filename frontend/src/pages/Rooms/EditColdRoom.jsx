@@ -1,5 +1,5 @@
 import EditColdRoomForm from "../../components/EditColdRoomForm.jsx";
-import "./editcoldroom.css";
+import "./room.css";
 export default function EditColdRoom() {
   return (
     <div className="edit-cold-room">

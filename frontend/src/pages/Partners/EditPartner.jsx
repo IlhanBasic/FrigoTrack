@@ -1,4 +1,4 @@
-import "./editpartner.css";
+import "./partner.css";
 import EditPartnerForm from "../../components/EditPartnerForm.jsx";
 export default function EditPartner() {
   return (

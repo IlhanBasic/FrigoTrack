@@ -1,4 +1,4 @@
-import "./editdocument.css";
+import "./document.css";
 import EditDocumentForm from "../../components/EditDocumentForm.jsx";
 export default function EditDocument() {
   return (

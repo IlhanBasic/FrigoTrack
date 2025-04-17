@@ -1,7 +1,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./createform.css";
+import "./form.css";
 export default function EditColdRoomForm() {
   const navigate = useNavigate();
   const [selectedColdRoom, setSelectedColdRoom] = useState(null);

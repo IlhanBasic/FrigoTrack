@@ -1,6 +1,6 @@
 import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./createform.css";
+import "./form.css";
 import { toast } from "react-toastify";
 import { VARIETY } from "../data/data.js";
 export default function CreateProductForm() {

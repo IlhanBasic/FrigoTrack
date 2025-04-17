@@ -2,7 +2,7 @@ import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import "./createform.css";
+import "./form.css";
 export default function CreatePaymentForm() {
   const navigate = useNavigate();
   const [documents, setDocuments] = useState([]);

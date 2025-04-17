@@ -1,6 +1,6 @@
 import { useActionState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./createform.css";
+import "./form.css";
 import {toast} from 'react-toastify';
 export default function CreatePartnerForm() {
   const navigate = useNavigate();

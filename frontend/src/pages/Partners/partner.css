@@ -1,0 +1,6 @@
+.create-partner h1,.edit-partner h1 {
+    text-align: center;
+}
+.create-partner,.edit-partner {
+    margin-top:2em;
+}

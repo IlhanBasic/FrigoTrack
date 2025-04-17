@@ -1,7 +1,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./createform.css";
+import "./form.css";
 import { VARIETY } from "../data/data";
 export default function EditPartnerForm() {
   const navigate = useNavigate();

@@ -3,7 +3,7 @@ import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import "./createform.css";
+import "./form.css";
 import { VARIETY, PRODUCTS } from "../data/data.js";
 import { Trash, Plus } from "lucide-react";
 

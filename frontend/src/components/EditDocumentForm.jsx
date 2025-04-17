@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { PRODUCTS, VARIETY } from "../data/data";
 import { Trash, Plus } from "lucide-react";
 import { useSelector } from "react-redux";
-import "./createform.css";
+import "./form.css";
 import Loader from "./Loader";
 
 export default function EditDocumentForm() {

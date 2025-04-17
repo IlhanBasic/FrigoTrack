@@ -1,4 +1,4 @@
-import "./createdocument.css";
+import "./document.css";
 import CreateDocumentForm from "../../components/CreateDocumentForm";
 export default function createdocument() {
   return (

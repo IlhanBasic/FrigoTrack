@@ -1,4 +1,4 @@
-import './createpayment.css'
+import './payment.css'
 import CreatePaymentForm from '../../components/CreatePaymentForm'
 export default function CreatePayment(){
     return <div className='create-payment'>

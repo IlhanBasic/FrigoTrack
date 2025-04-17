@@ -1,4 +1,4 @@
-import "./editproduct.css";
+import "./product.css";
 import EditProductForm from "../../components/EditProductForm.jsx";
 export default function EditProduct() {
   return (

@@ -1,7 +1,7 @@
 import { useActionState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./createform.css";
+import "./form.css";
 export default function CreateColdRoomForm() {
   const navigate = useNavigate();
   async function createColdRoomAction(prevFormState, formData) {

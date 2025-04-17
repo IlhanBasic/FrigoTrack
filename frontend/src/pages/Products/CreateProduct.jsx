@@ -1,4 +1,4 @@
-import "./createproduct.css";
+import "./product.css";
 import CreateProductForm from '../../components/CreateProductForm.jsx';
 export default function CreateProduct() {
   return (

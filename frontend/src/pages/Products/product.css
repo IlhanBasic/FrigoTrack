@@ -1,0 +1,7 @@
+.create-product,.edit-product {
+  margin-top: 2em;
+}
+
+.create-product h1,.edit-product h1 {
+  text-align: center;
+}
