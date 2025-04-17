@@ -46,7 +46,6 @@ export default function EditPartnerForm() {
     const sugarContent = Number(formData.get("sugarContent"));
     const currentStockKg = product.currentStockKg;
     const errors = [];
-
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/products/${product._id}`,
