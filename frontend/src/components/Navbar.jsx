@@ -114,6 +114,15 @@ export default function Navbar() {
               Statistika
             </NavLink>
           </li>
+          <li>
+            <NavLink
+              to="/assistant"
+              end
+              onClick={() => isSmallScreen && setIsMenuOpen(false)}
+            >
+              Asistent
+            </NavLink>
+          </li>
           {isSmallScreen && (
             <li>
               <span className="user">Korisnik: {user?.username}</span>
