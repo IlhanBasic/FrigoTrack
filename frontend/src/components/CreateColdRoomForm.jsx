@@ -9,25 +9,28 @@ export default function CreateColdRoomForm() {
     const location = formData.get("location");
     const temperature = Number(formData.get("temperature"));
     const capacityKg = Number(formData.get("capacityKg"));
-    const currentLoadKg = formData.get("currentLoadKg");
     const type = formData.get("type");
     const isActive = formData.get("isActive") === "true";
+    const currentLoadKg = 0;
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/coldrooms`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          roomNumber,
-          location,
-          temperature,
-          capacityKg,
-          currentLoadKg,
-          type,
-          isActive,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/coldrooms`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomNumber,
+            location,
+            temperature,
+            capacityKg,
+            currentLoadKg,
+            type,
+            isActive,
+          }),
+        }
+      );
       if (response.ok) {
         toast.success("Prostor uspješno dodan!");
         navigate("/rooms");
@@ -59,10 +62,6 @@ export default function CreateColdRoomForm() {
         <div className="form-group">
           <label htmlFor="capacityKg">Kapacitet (kg)</label>
           <input type="number" name="capacityKg" id="capacityKg" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="currentLoadKg">Tezina na stanju (kg)</label>
-          <input type="number" name="currentLoadKg" id="currentLoadKg" />
         </div>
         <div className="form-group">
           <label htmlFor="type">Tip</label>

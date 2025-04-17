@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -17,18 +17,17 @@ export default function CreateDocumentForm() {
   const user = useSelector((state) => state.auth.user.username);
   const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
+  const [typeDocument, setTypeDocument] = useState("otkup");
 
   async function createDocumentAction(prevFormState, formData) {
     let userId = "";
     const type = formData.get("type");
-    const documentNumber = formData.get("documentNumber");
-    const date = formData.get("date");
+    const documentNumber = "";
+    const date = new Date();
     const partnerId = formData.get("partner");
     const notes = formData.get("notes");
-    const driverName = formData.get("driverName");
-    const vehiclePlate = formData.get("vehiclePlate");
-    const cost = Number(formData.get("cost"));
-    const status = formData.get("status");
+    const transportCost = Number(formData.get("transportCost"));
+    const status = "u pripremi";
 
     try {
       const userResponse = await fetch(
@@ -49,20 +48,24 @@ export default function CreateDocumentForm() {
       }
       userId = userData._id;
 
-      const productsResponse = await fetch(`${import.meta.env.VITE_API_URL}/products`);
+      const productsResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/products`
+      );
       const productsData = await productsResponse.json();
-      
+
       if (!productsResponse.ok) {
         toast.error(productsData.message);
       }
 
-      const documentItems = products.map(product => {
+      const documentItems = products.map((product) => {
         const matchingProduct = productsData.find(
-          p => p.name === product.productId && p.variety === product.varietyId
+          (p) => p.name === product.productId && p.variety === product.varietyId
         );
 
         if (!matchingProduct) {
-          toast.error(`Product not found: ${product.productId} - ${product.varietyId}`);
+          toast.error(
+            `Proizvod nije pronadjen: ${product.productId} - ${product.varietyId}`
+          );
         }
 
         return {
@@ -71,7 +74,8 @@ export default function CreateDocumentForm() {
           quantity: product.quantity,
           pricePerUnit: matchingProduct.sellingPrice,
           vatRate: 20,
-          total: product.quantity * matchingProduct.sellingPrice * (1 + 20 / 100),
+          total:
+            product.quantity * matchingProduct.sellingPrice * (1 + 20 / 100),
         };
       });
 
@@ -79,7 +83,7 @@ export default function CreateDocumentForm() {
         `${import.meta.env.VITE_API_URL}/documents`,
         {
           method: "POST",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
@@ -90,9 +94,7 @@ export default function CreateDocumentForm() {
             partner: partnerId,
             items: documentItems,
             notes,
-            driverName,
-            vehiclePlate,
-            cost,
+            transportCost,
             status,
             createdBy: userId,
           }),
@@ -109,7 +111,9 @@ export default function CreateDocumentForm() {
       }
     } catch (err) {
       toast.error(err);
-      return { errors: [err.message || "Došlo je do greške pri slanju zahtjeva."] };
+      return {
+        errors: [err.message || "Došlo je do greške pri slanju zahtjeva."],
+      };
     }
   }
 
@@ -150,7 +154,7 @@ export default function CreateDocumentForm() {
           },
         ];
       });
-      
+
       setSelectedProduct("");
       setSelectedVariety("");
       setQuantity("");
@@ -167,41 +171,25 @@ export default function CreateDocumentForm() {
     }
   }
 
-
   return (
     <div className="create-form">
       <form action={formAction} method="post">
         <div className="form-group">
           <label htmlFor="type">Tip:</label>
-          <select id="type" name="type" required defaultValue="">
+          <select
+            id="type"
+            name="type"
+            required
+            defaultValue=""
+            value={typeDocument}
+            onChange={(e) => setTypeDocument(e.target.value)}
+          >
             <option value="" disabled>
               -- Izaberite tip --
             </option>
             <option value="otkup">Otkup</option>
             <option value="prodaja">Prodaja</option>
-            <option value="otpis">Otpis</option>
           </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="documentNumber">Broj dokumenta:</label>
-          <input
-            type="text"
-            id="documentNumber"
-            name="documentNumber"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="date">Datum:</label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            required
-            defaultValue={new Date().toISOString().split("T")[0]}
-          />
         </div>
 
         <div className="form-group">
@@ -210,11 +198,18 @@ export default function CreateDocumentForm() {
             <option value="" disabled>
               -- Izaberite partnera --
             </option>
-            {partners.map((partner) => (
-              <option key={partner._id} value={partner._id}>
-                {partner.name} - {partner.pibOrJmbg}
-              </option>
-            ))}
+            {partners
+              .filter(
+                (partner) =>
+                  (typeDocument === "otkup" &&
+                    partner.type === "poljoprivrednik") ||
+                  (typeDocument === "prodaja" && partner.type === "kupac")
+              )
+              .map((partner) => (
+                <option key={partner._id} value={partner._id}>
+                  {partner.name} - {partner.pibOrJmbg}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -285,9 +280,9 @@ export default function CreateDocumentForm() {
               />
             </div>
 
-            <button 
-              type="button" 
-              className="add-button" 
+            <button
+              type="button"
+              className="add-button"
               onClick={addItem}
               disabled={!selectedProduct || !selectedVariety || !quantity}
             >
@@ -297,36 +292,19 @@ export default function CreateDocumentForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="driverName">Ime vozača:</label>
-          <input type="text" id="driverName" name="driverName" />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="vehiclePlate">Registarska oznaka vozila:</label>
-          <input type="text" id="vehiclePlate" name="vehiclePlate" />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="cost">Trošak:</label>
-          <input type="number" id="cost" name="cost" defaultValue={0} />
+          <label htmlFor="transportCost">Trošak prevoza:</label>
+          <input
+            type="number"
+            id="transportCost"
+            name="transportCost"
+            defaultValue={0}
+            step={"0.01"}
+          />
         </div>
 
         <div className="form-group">
           <label htmlFor="notes">Napomene:</label>
           <textarea id="notes" name="notes"></textarea>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="status">Status:</label>
-          <select id="status" name="status" required defaultValue="">
-            <option value="" disabled>
-              -- Izaberite status --
-            </option>
-            <option value="u pripremi">U pripremi</option>
-            <option value="potvrđen">Potvrđen</option>
-            <option value="otpremljen">Otpremljen</option>
-            <option value="storniran">Storniran</option>
-          </select>
         </div>
 
         <div className="form-group">

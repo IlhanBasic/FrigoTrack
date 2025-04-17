@@ -201,6 +201,7 @@ export default function Stats() {
       name: `${product.name} - ${product.variety}`,
       quantity: totalQuantity,
       revenue: totalRevenue,
+      year:product.harvestYear
     };
   });
 
@@ -231,7 +232,6 @@ export default function Stats() {
                 )
             )}
           </div>
-          <div className="subtitle">+15.8% od prošlog perioda</div>
         </div>
 
         <div className="stats-card">
@@ -257,7 +257,6 @@ export default function Stats() {
                 : 0
             )}
           </div>
-          <div className="subtitle">+5.3% od prošlog perioda</div>
         </div>
 
         <div className="stats-card">
@@ -268,7 +267,6 @@ export default function Stats() {
           <div className="value">
             {orders.filter((order) => order.type === "prodaja").length}
           </div>
-          <div className="subtitle">+12% od prošlog perioda</div>
         </div>
 
         <div className="stats-card">
@@ -279,7 +277,6 @@ export default function Stats() {
           <div className="value">
             {partners.filter((partner) => partner.isActive).length}
           </div>
-          <div className="subtitle">+8% od prošlog perioda</div>
         </div>
       </div>
 
@@ -300,7 +297,7 @@ export default function Stats() {
                   <Package size={20} />
                 </div>
                 <div className="top-item-info">
-                  <h4>{product.name}</h4>
+                  <h4>{product.name} ({product.year})</h4>
                   <p>
                     {(product.quantity / 1000.0).toFixed(2)} T |{" "}
                     {new Intl.NumberFormat("sr-RS", {

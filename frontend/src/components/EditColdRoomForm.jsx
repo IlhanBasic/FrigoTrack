@@ -9,7 +9,6 @@ export default function EditColdRoomForm() {
     async function fetchColdRoom() {
       try {
         const id = window.location.pathname.split("/")[3];
-        console.log(id);
         if (!id) {
           toast.error("Niste izabrali prostor");
           navigate("/rooms");
@@ -30,30 +29,32 @@ export default function EditColdRoomForm() {
     const location = formData.get("location");
     const temperature = Number(formData.get("temperature"));
     const capacityKg = Number(formData.get("capacityKg"));
-    const currentLoadKg = formData.get("currentLoadKg");
+    const currentLoadKg = selectedColdRoom.currentLoadKg;
     const type = formData.get("type");
     const isActive = formData.get("isActive") === "true";
-    const errors = {};
+    const errors = [];
     if (!location.trim()) {
-      errors.location = "Lokacija ne smije biti prazna";
+      errors.push("Lokacija ne smije biti prazna");
     }
     if (isNaN(temperature) || temperature < -200 || temperature > 50) {
-      errors.temperature =
-        "Temperatura mora biti broj izme u rasponu od -200 do 50 stepeni";
+      errors.push(
+        "Temperatura mora biti broj izme u rasponu od -200 do 50 stepeni"
+      );
     }
     if (isNaN(capacityKg) || capacityKg <= 0) {
-      errors.capacityKg = "Kapacitet mora biti pozitivan broj";
+      errors.push("Kapacitet mora biti pozitivan broj");
     }
     if (
       isNaN(currentLoadKg) ||
       currentLoadKg < 0 ||
       currentLoadKg > capacityKg
     ) {
-      errors.currentLoadKg =
-        "Trenutno optere enje mora biti broj izme u rasponu od 0 do kapaciteta";
+      errors.push(
+        "Trenutano opterecenje mora biti broj izmedju rasponu od 0 do kapaciteta."
+      );
     }
     if (!type) {
-      errors.type = "Tip prostora mora biti izabran";
+      errors.push("Tip prostora mora biti izabran");
     }
     if (Object.keys(errors).length > 0) {
       return { errors };
@@ -83,7 +84,7 @@ export default function EditColdRoomForm() {
       return { errors: await response.json() };
     } catch (err) {
       toast.error(err);
-      return { errors: err };
+      return { errors: [err] };
     }
   }
   const [formState, formAction] = useActionState(EditColdRoomAction, {
@@ -133,21 +134,6 @@ export default function EditColdRoomForm() {
               setSelectedColdRoom({
                 ...selectedColdRoom,
                 capacityKg: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="currentLoadKg">Tezina na stanju (kg)</label>
-          <input
-            type="number"
-            name="currentLoadKg"
-            id="currentLoadKg"
-            value={selectedColdRoom?.currentLoadKg}
-            onChange={(e) =>
-              setSelectedColdRoom({
-                ...selectedColdRoom,
-                currentLoadKg: e.target.value,
               })
             }
           />

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { TrendingUp, TrendingDown, Thermometer } from "lucide-react";
 import "./home.css";
 import { useSelector } from "react-redux";
 import {
@@ -134,10 +133,6 @@ export default function Home() {
             ) / 1000.0}{" "}
             t
           </div>
-          <div className="trend">
-            <TrendingUp size={16} />
-            +5.3% od prošle nedelje
-          </div>
         </div>
 
         <div className="metric-card">
@@ -149,20 +144,12 @@ export default function Home() {
             ) / 1000.0}{" "}
             t
           </div>
-          <div className="trend negative">
-            <TrendingDown size={16} />
-            -8% od prošlog meseca
-          </div>
         </div>
 
         <div className="metric-card">
           <h3>Aktivne porudžbine</h3>
           <div className="value">
             {documents.filter((doc) => doc.type === "otkup").length}
-          </div>
-          <div className="trend">
-            <TrendingUp size={16} />
-            +12% od prošle nedelje
           </div>
         </div>
 
@@ -185,10 +172,6 @@ export default function Home() {
                   0
                 )
             )}
-          </div>
-          <div className="trend">
-            <TrendingUp size={16} />
-            +15.8% od prošlog meseca
           </div>
         </div>
       </div>

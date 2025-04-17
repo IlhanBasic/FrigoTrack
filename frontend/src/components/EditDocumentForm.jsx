@@ -10,12 +10,14 @@ import Loader from "./Loader";
 export default function EditDocumentForm() {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+  const [initStatus, setInitStatus] = useState("");
   const [selectedVariety, setSelectedVariety] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [quantity, setQuantity] = useState("");
   const [document, setDocument] = useState(null);
   const [partners, setPartners] = useState([]);
   const [products, setProducts] = useState([]);
+  const [typeDocument, setTypeDocument] = useState("");
   const hasFetched = useRef(false);
   useEffect(() => {
     async function fetchData() {
@@ -42,6 +44,8 @@ export default function EditDocumentForm() {
         ]);
 
         setDocument(documentData.data);
+        setInitStatus(documentData.data.status);
+        setTypeDocument(documentData.data.type);
         if (documentData.data.status === "potvrđen") {
           toast.info("Dokument je već potvrđen");
           navigate("/documents");
@@ -155,9 +159,7 @@ export default function EditDocumentForm() {
               vatRate: item.vatRate,
               total: item.total,
             })),
-            driverName: document.driverName,
-            vehiclePlate: document.vehiclePlate,
-            cost: document.cost,
+            transportCost: document.transportCost,
             notes: document.notes,
             status: document.status,
           }),
@@ -187,67 +189,41 @@ export default function EditDocumentForm() {
   return (
     <div className="create-form">
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="type">Tip:</label>
-          <select
-            id="type"
-            name="type"
-            required
-            value={document.type || ""}
-            onChange={(e) => setDocument({ ...document, type: e.target.value })}
-          >
-            <option value="" disabled>
-              -- Izaberite tip --
-            </option>
-            <option value="otkup">Otkup</option>
-            <option value="prodaja">Prodaja</option>
-            <option value="premestaj">Premestaj</option>
-            <option value="otpis">Otpis</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="date">Datum:</label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            required
-            value={
-              document.date
-                ? new Date(document.date).toISOString().split("T")[0]
-                : ""
-            }
-            onChange={(e) => setDocument({ ...document, date: e.target.value })}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="partner">Partner:</label>
-          <select
-            id="partner"
-            name="partner"
-            required
-            value={document.partner._id || ""}
-            onChange={(e) =>
-              setDocument({
-                ...document,
-                partner: {
-                  ["_id"]: e.target.value,
-                },
-              })
-            }
-          >
-            <option value="" disabled>
-              -- Izaberite partnera --
-            </option>
-            {partners.map((partner) => (
-              <option key={partner._id} value={partner._id}>
-                {partner.name} - {partner.pibOrJmbg}
+        {initStatus !== "otpremljen" && document.type !== "otpis" && (
+          <div className="form-group">
+            <label htmlFor="partner">Partner:</label>
+            <select
+              id="partner"
+              name="partner"
+              required
+              value={document.partner._id || ""}
+              onChange={(e) =>
+                setDocument({
+                  ...document,
+                  partner: {
+                    ["_id"]: e.target.value,
+                  },
+                })
+              }
+            >
+              <option value="" disabled>
+                -- Izaberite partnera --
               </option>
-            ))}
-          </select>
-        </div>
+              {partners
+                .filter(
+                  (partner) =>
+                    (document.type === "otkup" &&
+                      partner.type === "poljoprivrednik") ||
+                    (document.type === "prodaja" && partner.type === "kupac")
+                )
+                .map((partner) => (
+                  <option key={partner._id} value={partner._id}>
+                    {partner.name} - {partner.pibOrJmbg}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
 
         <div className="form-group">
           <label>Stavke:</label>
@@ -332,39 +308,15 @@ export default function EditDocumentForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="driverName">Ime vozača:</label>
-          <input
-            type="text"
-            id="driverName"
-            name="driverName"
-            value={document.driverName || ""}
-            onChange={(e) =>
-              setDocument({ ...document, driverName: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="vehiclePlate">Registarska oznaka vozila:</label>
-          <input
-            type="text"
-            id="vehiclePlate"
-            name="vehiclePlate"
-            value={document.vehiclePlate || ""}
-            onChange={(e) =>
-              setDocument({ ...document, vehiclePlate: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="cost">Trošak:</label>
+          <label htmlFor="transportCost">Trošak prevoza:</label>
           <input
             type="number"
-            id="cost"
-            name="cost"
-            value={document.cost || 0}
-            onChange={(e) => setDocument({ ...document, cost: e.target.value })}
+            id="transportCost"
+            name="transportCost"
+            value={document.transportCost || ""}
+            onChange={(e) =>
+              setDocument({ ...document, transportCost: e.target.value })
+            }
           />
         </div>
 

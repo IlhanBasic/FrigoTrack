@@ -37,11 +37,12 @@ export const TABLEHEADERS = {
   date: "Datum",
   driverName: "Ime vozaca",
   vehiclePlate: "Registarska oznaka vozila",
-  cost: "Trosak prevoza (RSD)",
+  transportCost: "Trosak prevoza (RSD)",
   notes: "Opis",
   status: "Status",
   amountPaid: "Placeno (RSD)",
   paymentDate: "Datum placanja",
+  isPaid: "Plaćen",
 };
 export const VARIETY = {
   malina: ["vilamet", "meeker", "polka", "heritage"],
@@ -52,4 +53,12 @@ export const VARIETY = {
   tresnja: ["burlat", "cordia", "regina", "karina"],
   visnja: ["oblačinska", "keleris", "šumadinka", "nana"],
 };
-export const PRODUCTS = ["malina", "jagoda", "ribizla", "kupina", "borovnica", "tresnja", "visnja"];
+export const PRODUCTS = [
+  "malina",
+  "jagoda",
+  "ribizla",
+  "kupina",
+  "borovnica",
+  "tresnja",
+  "visnja",
+];

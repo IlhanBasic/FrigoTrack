@@ -10,19 +10,12 @@ export default function CreatePaymentForm() {
   const token = useSelector((state) => state.auth.token);
   async function createPaymentAction(prevFormState, formData) {
     let userId = "";
-    const amountPaid = formData.get("amountPaid");
-    const paymentDate = formData.get("paymentDate");
+    const paymentDate = new Date();
     const recordedBy = formData.get("recordedBy");
     const documentId = formData.get("documentId");
     const errors = [];
-    if (!amountPaid || isNaN(amountPaid) || amountPaid <= 0) {
-      errors.push("Iznos transakcije mora biti pozitivan broj.");
-    }
     if (!paymentDate) {
       errors.push("Datum transakcije je obavezan.");
-    }
-    if (!method) {
-      errors.push("Metoda transakcije je obavezna.");
     }
     if (!recordedBy) {
       errors.push("Zabilježio je obavezan.");
@@ -58,7 +51,6 @@ export default function CreatePaymentForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amountPaid,
           paymentDate,
           recordedBy: userId,
           document: documentId,
@@ -67,8 +59,10 @@ export default function CreatePaymentForm() {
       if (response.ok) {
         toast.success("Transakcija uspješno dodana!");
         navigate("/payments");
+      } else {
+        const res = await response.json();
+        return { errors: [res.message] };
       }
-      return { errors: await response.json() };
     } catch (err) {
       toast.error(err);
     }
@@ -76,7 +70,9 @@ export default function CreatePaymentForm() {
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/documents`)
       .then((res) => res.json())
-      .then((data) => setDocuments(data.data));
+      .then((data) =>
+        setDocuments(data.data.filter((doc) => doc.type === "otkup"))
+      );
   }, []);
   const [formState, formAction] = useActionState(createPaymentAction, {
     errors: null,
@@ -84,14 +80,6 @@ export default function CreatePaymentForm() {
   return (
     <div className="create-form">
       <form action={formAction} method="post">
-        <div className="form-group">
-          <label htmlFor="amountPaid">Iznos transakcije:</label>
-          <input type="number" id="amountPaid" name="amountPaid" required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="paymentDate">Datum transakcije:</label>
-          <input type="date" id="paymentDate" name="paymentDate" required />
-        </div>
         <div className="form-group">
           <label htmlFor="recordedBy">Zabilježio:</label>
           <input
@@ -105,7 +93,7 @@ export default function CreatePaymentForm() {
         <div className="form-group">
           <label htmlFor="description">Po dokumentu:</label>
           <select id="documentId" name="documentId" required>
-            {documents.map((document) => (
+            {documents.filter(doc=>doc.isPaid !==true).map((document) => (
               <option key={document._id} value={document._id}>
                 {document.documentNumber}
               </option>

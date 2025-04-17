@@ -20,7 +20,6 @@ export default function Table({ items, type }) {
   const [term, setTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const tableRef = useRef(null);
-  console.log(items);
   const exportToPDF = () => {
     if (!filteredItems.length) return alert("Nema podataka za export.");
 
@@ -300,7 +299,7 @@ export default function Table({ items, type }) {
                             minute: "2-digit",
                             second: "2-digit",
                           }).format(new Date(item[key]))
-                        : key === "isActive"
+                        : key === "isActive" || key === "isPaid"
                         ? item[key]
                           ? "DA"
                           : "NE"

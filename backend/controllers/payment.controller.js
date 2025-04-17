@@ -10,26 +10,7 @@ const validatePaymentData = (data, isUpdate = false) => {
       errors.document = "Validna referenca na dokument je neophodna.";
     }
   }
-
-  if (!isUpdate || data.amountPaid !== undefined) {
-    if (
-      data.amountPaid === undefined ||
-      isNaN(data.amountPaid) ||
-      data.amountPaid <= 0
-    ) {
-      errors.amountPaid = "Validan iznos plaćanja je neophodan.";
-    }
-  }
-
-  if (data.paymentDate) {
-    const paymentDate = new Date(data.paymentDate);
-    if (isNaN(paymentDate.getTime())) {
-      errors.paymentDate = "Validan datum plaćanja je neophodan.";
-    } else if (paymentDate > new Date()) {
-      errors.paymentDate = "Plaćanje ne može biti u budućnosti.";
-    }
-  }
-
+  data.paymentDate = new Date();
   if (data.recordedBy && !mongoose.Types.ObjectId.isValid(data.recordedBy)) {
     errors.recordedBy = "Validna referenca na korisnika je neophodna.";
   }
@@ -125,7 +106,12 @@ export const createPayment = async (req, res) => {
         message: "Dokument nije pronađen.",
       });
     }
-
+    if(document.isPaid){
+      return res.status(500).json({
+        success:false,
+        message:"Dokument je već plaćen."
+      });
+    }
     const paymentData = {
       ...req.body,
       paymentDate: req.body.paymentDate || new Date(),
@@ -133,7 +119,8 @@ export const createPayment = async (req, res) => {
     };
 
     const payment = await Payment.create(paymentData);
-
+    document.isPaid = true;
+    await document.save();
     res.status(201).json({
       success: true,
       message: "Uspеšno kreiranje plaćanja.",

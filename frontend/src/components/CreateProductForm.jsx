@@ -13,7 +13,6 @@ export default function CreateProductForm() {
     const purchasePrice = Number(formData.get("purchasePrice"));
     const sellingPrice = Number(formData.get("sellingPrice"));
     const vatRate = Number(formData.get("vatRate"));
-    const currentStockKg = Number(formData.get("currentStockKg"));
     const minStockKg = Number(formData.get("minStockKg"));
     const coldRoomId = formData.get("coldRoomId");
     const harvestYear = Number(formData.get("harvestYear"));
@@ -23,8 +22,9 @@ export default function CreateProductForm() {
     const brix = Number(formData.get("brix"));
     const acidity = Number(formData.get("acidity"));
     const sugarContent = Number(formData.get("sugarContent"));
-    const coldRooms = formData.get("coldRoomId");
+    const currentStockKg = 0;
     const errors = [];
+
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/products`, {
         method: "POST",
@@ -37,7 +37,6 @@ export default function CreateProductForm() {
           purchasePrice,
           sellingPrice,
           vatRate,
-          currentStockKg,
           minStockKg,
           coldRoomId,
           harvestYear,
@@ -49,15 +48,44 @@ export default function CreateProductForm() {
           sugarContent,
         }),
       });
+
       if (response.ok) {
-        toast.success("Proizvod uspješno dodan!");
+        const data = await response.json();
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/products/store`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              productId: data.product._id,
+              coldRoomId,
+              quantityKg: currentStockKg,
+              storageDate: new Date(),
+            }),
+          }
+        );
+
+        const storeData = await res.json();
+        if (!res.ok) {
+          errors.push(storeData.message);
+        }
+
+        toast.success("Proizvod uspješno dodan!");
         navigate("/products");
+      } else {
+        const data = await response.json();
+        errors.push(`Proverite podatke:${data.message}`);
+        return { errors: errors };
       }
-      return { errors: await response.json() };
     } catch (err) {
-      toast.error(err);
+      errors.push(err.message);
+      toast.error(err.message);
+      return { errors };
     }
   }
+
   const [formState, formAction] = useActionState(createProductAction, {
     errors: null,
   });
@@ -78,9 +106,7 @@ export default function CreateProductForm() {
             name="name"
             required
           >
-            <option value="malina" selected>
-              Malina
-            </option>
+            <option value="malina">Malina</option>
             <option value="jagoda">Jagoda</option>
             <option value="ribizla">Ribizla</option>
             <option value="kupina">Kupina</option>
@@ -100,16 +126,6 @@ export default function CreateProductForm() {
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor="sku">Šifra:</label>
-          <input
-            type="text"
-            id="sku"
-            name="sku"
-            required
-            pattern="^[A-Z]{3}-[A-Z]{3}-\d{4}$"
-          />
-        </div>
-        <div className="form-group">
           <label htmlFor="harvestYear">Godina Berbe:</label>
           <input
             type="number"
@@ -127,7 +143,7 @@ export default function CreateProductForm() {
             id="purchasePrice"
             name="purchasePrice"
             required
-            min="0"
+            step="0.01"
           />
         </div>
         <div className="form-group">
@@ -138,19 +154,17 @@ export default function CreateProductForm() {
             name="sellingPrice"
             required
             min="0"
+            step={"0.01"}
           />
         </div>
         <div className="form-group">
           <label htmlFor="vatRate">PDV:</label>
-          <input type="number" id="vatRate" name="vatRate" defaultValue="20" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="currentStockKg">Tezina na Stanju:</label>
           <input
             type="number"
-            id="currentStockKg"
-            name="currentStockKg"
-            defaultValue="0"
+            id="vatRate"
+            name="vatRate"
+            defaultValue="20"
+            step={"0.01"}
           />
         </div>
         <div className="form-group">
@@ -160,6 +174,7 @@ export default function CreateProductForm() {
             id="minStockKg"
             name="minStockKg"
             defaultValue="10"
+            step={"0.01"}
           />
         </div>
         <div className="form-group">
@@ -172,15 +187,6 @@ export default function CreateProductForm() {
             ))}
           </select>
         </div>
-        {formState.errors && formState.errors.length > 0 && (
-          <div className="form-group">
-            <ul className="errors">
-              {formState.errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        )}
         <div className="form-group">
           <label htmlFor="sugarContent">Količina Šećera (%):</label>
           <input
@@ -189,15 +195,22 @@ export default function CreateProductForm() {
             name="sugarContent"
             min="0"
             max="100"
+            step={"0.01"}
           />
         </div>
         <div className="form-group">
           <label htmlFor="acidity">Kiselost (°pH):</label>
-          <input type="number" id="acidity" name="acidity" min="0" />
+          <input
+            type="number"
+            id="acidity"
+            name="acidity"
+            min="0"
+            step={"0.01"}
+          />
         </div>
         <div className="form-group">
           <label htmlFor="brix">Brix (%):</label>
-          <input type="number" id="brix" name="brix" />
+          <input type="number" id="brix" name="brix" step={"0.01"} />
         </div>
         <div className="form-group">
           <label htmlFor="freezingMethod">Metoda Zamrzavanja:</label>
@@ -214,6 +227,15 @@ export default function CreateProductForm() {
           <label htmlFor="isActive">Aktivan:</label>
           <input type="checkbox" id="isActive" name="isActive" defaultChecked />
         </div>
+        {formState?.errors && formState.errors.length > 0 && (
+          <div className="form-group">
+            <ul className="errors">
+              {formState.errors.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <button type="submit">Dodaj Proizvod</button>
       </form>
     </div>

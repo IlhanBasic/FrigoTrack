@@ -1,20 +1,28 @@
 import Document from "../models/document.model.js";
 import mongoose from "mongoose";
 
-const validateDocumentData = (data, isUpdate = false) => {
+const validateDocumentData = async (data, isUpdate = false) => {
   const errors = {};
 
   if (!isUpdate || data.type !== undefined) {
-    if (!["otkup", "prodaja", "premestaj", "otpis"].includes(data.type)) {
+    if (!["otkup", "prodaja"].includes(data.type)) {
       errors.type = "Nevalidan tip dokumenta.";
     }
   }
-
-  if (data.documentNumber) {
-    const prefix = data.type ? data.type.toUpperCase().substring(0, 3) : "";
-    const regex = new RegExp(`^${prefix}-\\d{4}-\\d{3}$`);
-    if (!regex.test(data.documentNumber)) {
-      errors.documentNumber = `Broj dokumenta mora pratiti format ${prefix}-YYYY-NNN.`;
+  if (!isUpdate) {
+    try {
+      const count = await Document.countDocuments({
+        createdAt: { $gte: new Date(new Date().getFullYear(), 0, 1) },
+      });
+      const number = count + 1;
+      data.documentNumber =
+        data.type.slice(0, 3).toUpperCase() +
+        "-" +
+        new Date().getFullYear() +
+        "-" +
+        number.toString().padStart(3, "0");
+    } catch (error) {
+      console.error("Greška prilikom generisanja broja dokumenta:", error);
     }
   }
 
@@ -55,34 +63,17 @@ const validateDocumentData = (data, isUpdate = false) => {
     }
   }
 
-  if (data.transport) {
-    if (
-      data.transport.driverName &&
-      typeof data.transport.driverName !== "string"
-    ) {
-      errors["transport.driverName"] = "Ime vozača mora biti string.";
-    }
-    if (
-      data.transport.vehiclePlate &&
-      typeof data.transport.vehiclePlate !== "string"
-    ) {
-      errors["transport.vehiclePlate"] = "Broj tablica mora biti string.";
-    }
-    if (
-      data.transport.cost !== undefined &&
-      (isNaN(data.transport.cost) || data.transport.cost < 0)
-    ) {
-      errors["transport.cost"] = "Validna cena troška prevoza je neophodna.";
-    }
-  }
-
   if (
     data.status &&
     !["u pripremi", "potvrđen", "otpremljen", "storniran"].includes(data.status)
   ) {
     errors.status = "Nevalidan status dokumenta.";
   }
-
+  if (!isUpdate || data.transportCost !== undefined) {
+    if (data.transportCost < 0) {
+      errors.transportCost = "Trošak prevoza ne može biti negativan.";
+    }
+  }
   return Object.keys(errors).length > 0 ? errors : null;
 };
 
@@ -155,13 +146,16 @@ export const getDocumentById = async (req, res) => {
 
 export const createDocument = async (req, res) => {
   try {
-    const validationErrors = validateDocumentData(req.body);
-    if (validationErrors) {
-      return res.status(400).json({
-        success: false,
-        message: "Neuspešna validacija",
-        errors: validationErrors,
-      });
+    const validationErrors = await validateDocumentData(req.body);
+    console.log(validationErrors);
+    if (validationErrors != null) {
+      if (Object.keys(validationErrors).length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Neuspešna validacija",
+          errors: validationErrors,
+        });
+      }
     }
 
     if (req.body.documentNumber) {
@@ -194,6 +188,7 @@ export const createDocument = async (req, res) => {
       data: document,
     });
   } catch (error) {
+    console.log(error);
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).reduce((acc, err) => {
         acc[err.path] = err.message;
@@ -222,7 +217,8 @@ export const updateDocument = async (req, res) => {
       });
     }
 
-    const validationErrors = validateDocumentData(req.body, true);
+    const validationErrors = await validateDocumentData(req.body, true);
+    console.log(validationErrors);
     if (validationErrors) {
       return res.status(400).json({
         success: false,

@@ -1,27 +1,29 @@
 import Product from "../models/product.model.js";
+import ColdRoom from "../models/coldRoom.model.js";
 import mongoose from "mongoose";
 
 const validateProductData = (data, isUpdate = false) => {
   const errors = {};
+  const currentYear = new Date().getFullYear();
 
-  // Required fields validation
+  const validNames = [
+    "malina",
+    "jagoda",
+    "ribizla",
+    "kupina",
+    "borovnica",
+    "tresnja",
+    "visnja",
+  ];
+  const validFreezingMethods = ["IQF", "block"];
+
+  // Naziv proizvoda
   if (!isUpdate || data.name !== undefined) {
-    if (
-      !data.name ||
-      ![
-        "malina",
-        "jagoda",
-        "ribizla",
-        "kupina",
-        "borovnica",
-        "trešnja",
-        "višnja",
-      ].includes(data.name)
-    ) {
+    if (!data.name || !validNames.includes(data.name)) {
       errors.name = "Validno ime proizvoda je neophodno.";
     }
   }
-
+  // Vrsta
   if (!isUpdate || data.variety !== undefined) {
     if (
       !data.variety ||
@@ -32,18 +34,19 @@ const validateProductData = (data, isUpdate = false) => {
     }
   }
 
+  // Godina berbe
   if (!isUpdate || data.harvestYear !== undefined) {
-    const currentYear = new Date().getFullYear();
     if (
       !data.harvestYear ||
       isNaN(data.harvestYear) ||
       data.harvestYear < 2020 ||
       data.harvestYear > currentYear
     ) {
-      errors.harvestYear = `Godina berbe mora biti veća od 2020 i manja od ${currentYear}.`;
+      errors.harvestYear = `Godina berbe mora biti između 2020 i ${currentYear}.`;
     }
   }
 
+  // Nabavna cena
   if (!isUpdate || data.purchasePrice !== undefined) {
     if (
       data.purchasePrice === undefined ||
@@ -54,6 +57,7 @@ const validateProductData = (data, isUpdate = false) => {
     }
   }
 
+  // Prodajna cena
   if (!isUpdate || data.sellingPrice !== undefined) {
     if (
       data.sellingPrice === undefined ||
@@ -64,40 +68,70 @@ const validateProductData = (data, isUpdate = false) => {
     }
   }
 
-  if (data.sku && !/^[A-Z]{3}-[A-Z]{3}-\d{4}$/.test(data.sku)) {
-    errors.sku = "SKU mora biti u formatu XXX-XXX-YYYY.";
-  }
+  // Poređenje cena
   if (data.purchasePrice !== undefined && data.sellingPrice !== undefined) {
     if (data.sellingPrice < data.purchasePrice) {
       errors.sellingPrice = "Prodajna cena ne može biti manja od nabavne cene.";
     }
   }
 
-  if (data.qualityIndicators) {
-    if (
-      data.qualityIndicators.sugarContent !== undefined &&
-      (data.qualityIndicators.sugarContent < 0 ||
-        data.qualityIndicators.sugarContent > 100)
-    ) {
-      errors["qualityIndicators.sugarContent"] =
-        "Procenat šećera mora biti između 0 i 100";
-    }
-
-    if (
-      data.qualityIndicators.acidity !== undefined &&
-      data.qualityIndicators.acidity < 0
-    ) {
-      errors["qualityIndicators.acidity"] = "Kiselost ne može biti negativna.";
-    }
-
-    if (
-      data.qualityIndicators.freezingMethod &&
-      !["IQF", "block"].includes(data.qualityIndicators.freezingMethod)
-    ) {
-      errors["qualityIndicators.freezingMethod"] = "Nevalidan metod zamrzavanja.";
+  // Minimalna zaliha
+  if (!isUpdate || data.minStockKg !== undefined) {
+    if (isNaN(data.minStockKg) || data.minStockKg < 0) {
+      errors.minStockKg = "Minimalna zaliha mora biti nenegativan broj.";
     }
   }
 
+  // Hladnjača
+  if (!isUpdate || data.coldRoomId !== undefined) {
+    if (!data.coldRoomId || typeof data.coldRoomId !== "string") {
+      errors.coldRoomId = "Hladnjača je obavezna.";
+    }
+  }
+
+  // Datum isteka
+  if (!isUpdate || data.expiryDate !== undefined) {
+    if (data.expiryDate) {
+      const expiry = new Date(data.expiryDate);
+      const today = new Date();
+      if (expiry < today) {
+        errors.expiryDate = "Datum isteka mora biti u budućnosti.";
+      }
+    }
+  }
+
+  // Pokazatelji kvaliteta (ako postoje)
+  if (
+    data.brix !== undefined &&
+    (isNaN(data.brix) || data.brix < 0 || data.brix > 100)
+  ) {
+    errors.brix = "Brix mora biti broj između 0 i 100.";
+  }
+
+  if (data.acidity !== undefined && (isNaN(data.acidity) || data.acidity < 0)) {
+    errors.acidity = "Kiselost ne može biti negativna.";
+  }
+
+  if (
+    data.sugarContent !== undefined &&
+    (isNaN(data.sugarContent) ||
+      data.sugarContent < 0 ||
+      data.sugarContent > 100)
+  ) {
+    errors.sugarContent = "Procenat šećera mora biti između 0 i 100.";
+  }
+
+  if (
+    data.freezingMethod !== undefined &&
+    !validFreezingMethods.includes(data.freezingMethod)
+  ) {
+    errors.freezingMethod = "Nevalidan metod zamrzavanja.";
+  }
+  if (!isUpdate) {
+    data.sku = `${data.name.slice(0, 3).toUpperCase()}-${data.variety
+      .slice(0, 3)
+      .toUpperCase()}-${data.harvestYear.toString()}`;
+  }
   return Object.keys(errors).length > 0 ? errors : null;
 };
 
@@ -119,7 +153,9 @@ export const getAllProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Nevalidan ID format za proizvod." });
+      return res
+        .status(400)
+        .json({ message: "Nevalidan ID format za proizvod." });
     }
 
     const product = await Product.findById(req.params.id);
@@ -181,6 +217,7 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
+    // Provera validnosti ID-a proizvoda
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: "Nevalidan ID proizvoda." });
     }
@@ -193,6 +230,7 @@ export const updateProduct = async (req, res) => {
       });
     }
 
+    // Provera da li postoji proizvod sa istim SKU
     if (req.body.sku) {
       const existingProduct = await Product.findOne({
         sku: req.body.sku,
@@ -205,18 +243,62 @@ export const updateProduct = async (req, res) => {
       }
     }
 
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
+    // Pronađi proizvod koji se ažurira
+    const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).json({ message: "Proizvod nije pronadjen." });
+      return res.status(404).json({ message: "Proizvod nije pronađen." });
+    }
+
+    // Ako je hladnjača promenjena, ukloni proizvod sa stare hladnjače i dodaj na novu
+    if (
+      req.body.coldRoomId &&
+      req.body.coldRoomId !== product.coldRooms[0]?.coldRoom.toString()
+    ) {
+      // Konvertuj coldRoomId u ObjectId
+      const coldRoomObjectId = mongoose.Types.ObjectId(req.body.coldRoomId);
+
+      // Ukloni proizvod sa stare hladnjače
+      await Product.updateOne(
+        { _id: req.params.id },
+        {
+          $pull: {
+            coldRooms: { coldRoom: product.coldRooms[0]?.coldRoom },
+          },
+        }
+      );
+
+      // Dodaj proizvod na novu hladnjaču
+      await Product.updateOne(
+        { _id: req.params.id },
+        {
+          $push: {
+            coldRooms: {
+              coldRoom: coldRoomObjectId, // koristi ObjectId
+              quantityKg: req.body.currentStockKg,
+              storageDate: new Date(),
+            },
+          },
+        }
+      );
+    }
+
+    // Ažuriraj proizvod sa novim podacima
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Proizvod nije pronađen." });
     }
 
     res.status(200).json({
       message: "Proizvod uspešno azuriran.",
-      product,
+      product: updatedProduct,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -239,7 +321,9 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Nevažeći ID format za proizvod" });
+      return res
+        .status(400)
+        .json({ message: "Nevažeći ID format za proizvod" });
     }
 
     const product = await Product.findByIdAndDelete(req.params.id);
@@ -256,5 +340,65 @@ export const deleteProduct = async (req, res) => {
       message: "Neuspešno brisanje proizvoda.",
       error: error.message,
     });
+  }
+};
+
+export const storeProductInColdRoom = async (req, res) => {
+  const { productId, coldRoomId, quantityKg, storageDate } = req.body;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const product = await Product.findById(productId).session(session);
+    const coldRoom = await ColdRoom.findOne({ roomNumber: coldRoomId }).session(
+      session
+    );
+    console.log(productId, coldRoomId);
+    if (!product || !coldRoom) {
+      throw new Error("Proizvod ili komora nisu pronadjeni.");
+    }
+
+    // 1. Proveri da li ima mesta u hladnjači
+    if (coldRoom.currentLoadKg + quantityKg > coldRoom.capacityKg) {
+      throw new Error("Nema dovoljno kapaciteta u hladnjači.");
+    }
+
+    // 2. Dodaj coldRoom info u product
+    const existingColdRoom = product.coldRooms.find(
+      (cr) => cr.coldRoom.toString() === coldRoom._id.toString()
+    );
+    if (existingColdRoom) {
+      existingColdRoom.quantityKg += quantityKg;
+      existingColdRoom.storageDate =
+        storageDate && new Date(storageDate) > existingColdRoom.storageDate
+          ? new Date(storageDate)
+          : existingColdRoom.storageDate;
+    } else {
+      product.coldRooms.push({
+        coldRoom: coldRoom._id,
+        quantityKg,
+        storageDate: storageDate ? new Date(storageDate) : new Date(),
+      });
+    }
+
+    product.currentStockKg += quantityKg;
+
+    await product.save({ session });
+
+    // 3. Ažuriraj hladnjaču
+    coldRoom.currentLoadKg += quantityKg;
+
+    await coldRoom.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({ message: "Proizvod uspešno dodat u hladnjaču." });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(err);
+    res.status(500).json({ message: err.message });
   }
 };
