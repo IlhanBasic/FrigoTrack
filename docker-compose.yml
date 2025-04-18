@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  frigotrack-backend:
+    build: ./backend
+    container_name: frigotrack-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - PORT=5000
+    restart: unless-stopped
+
+  frigotrack-frontend:
+    build: ./frontend
+    container_name: frigotrack-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - frigotrack-backend
+    restart: unless-stopped

@@ -9,16 +9,22 @@ export default function Partners() {
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
-  useEffect(()=>{
-    if(!(user.role === "admin" || (user.role === "user" && user.department === "administracija"))){
+  useEffect(() => {
+    if (
+      !(
+        user.role === "admin" ||
+        (user.role === "user" && user.department === "administracija")
+      )
+    ) {
       toast.error("Nemate pristup ovoj stranici!");
       navigate("/");
     }
-  },[])
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [partners, setPartners] = useState([]);
+
   useEffect(() => {
-    async function fetchRooms() {
+    async function fetchPartners() {
       try {
         setIsLoading(true);
         const res = await fetch(`${import.meta.env.VITE_API_URL}/partners`, {
@@ -37,14 +43,14 @@ export default function Partners() {
         setIsLoading(false);
       }
     }
-    fetchRooms();
+    fetchPartners();
   }, []);
   if (isLoading) {
     return <Loader />;
   }
   return (
     <>
-      <Table items={partners} type={"partneri"} />
+      <Table items={partners} type={"partneri"}/>
     </>
   );
 }
