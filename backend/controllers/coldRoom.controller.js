@@ -1,4 +1,5 @@
 import ColdRoom from "../models/coldRoom.model.js";
+import Product from "../models/product.model.js";
 import mongoose from "mongoose";
 
 const validateColdRoomData = (data) => {

@@ -6,6 +6,7 @@ import { Send, X } from "lucide-react";
 export default function Chat() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [users, setUsers] = useState([]);
+  const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -67,7 +68,12 @@ export default function Chat() {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/users`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
       const filtered = data.filter((u) => u.username !== user.username);
@@ -91,7 +97,13 @@ export default function Chat() {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/messages/between?senderId=${
           user._id
-        }&receiverId=${selectedUser}`
+        }&receiverId=${selectedUser}`,
+        {
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
@@ -128,6 +140,7 @@ export default function Chat() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
         body: JSON.stringify(messageData),

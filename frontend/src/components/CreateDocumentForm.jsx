@@ -18,10 +18,22 @@ export default function CreateDocumentForm() {
   const navigate = useNavigate();
   const [typeDocument, setTypeDocument] = useState("otkup");
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/partners`)
+    fetch(`${import.meta.env.VITE_API_URL}/partners`,{
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => setPartners(data));
-    fetch(`${import.meta.env.VITE_API_URL}/products`)
+    fetch(`${import.meta.env.VITE_API_URL}/products`,{
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => setItems(data));
   }, []);
@@ -55,7 +67,13 @@ export default function CreateDocumentForm() {
       userId = userData._id;
 
       const productsResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/products`
+        `${import.meta.env.VITE_API_URL}/products`,{
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        }
       );
       const productsData = await productsResponse.json();
 
@@ -89,6 +107,7 @@ export default function CreateDocumentForm() {
         `${import.meta.env.VITE_API_URL}/documents`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

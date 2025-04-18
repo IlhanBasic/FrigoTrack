@@ -2,7 +2,9 @@ import { useActionState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./form.css";
+import { useSelector } from "react-redux";
 export default function CreateColdRoomForm() {
+  const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
   async function createColdRoomAction(prevFormState, formData) {
     const roomNumber = formData.get("roomNumber");
@@ -17,8 +19,10 @@ export default function CreateColdRoomForm() {
         `${import.meta.env.VITE_API_URL}/coldrooms`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             roomNumber,

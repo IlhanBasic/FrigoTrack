@@ -49,12 +49,15 @@ export default function CreatePaymentForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           paymentDate,
           recordedBy: userId,
           document: documentId,
         }),
+        credentials: "include",
+
       });
       if (response.ok) {
         toast.success("Transakcija uspješno dodana!");
@@ -68,7 +71,13 @@ export default function CreatePaymentForm() {
     }
   }
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/documents`)
+    fetch(`${import.meta.env.VITE_API_URL}/documents`,{
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) =>
         setDocuments(data.data.filter((doc) => doc.type === "otkup"))

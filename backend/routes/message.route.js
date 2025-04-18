@@ -5,9 +5,10 @@ import {
   getMessageById,
   getAllMessagesBettwenTwoUsers
 } from "../controllers/message.controller.js";
+import { verifyAdmin, verifyToken } from "../middleware/auth.middleware.js";
 const router = express.Router();
-router.post("/", createMessage);
-router.get("/", getAllMessages);
-router.get("/between", getAllMessagesBettwenTwoUsers);
-router.get("/:id", getMessageById);
+router.post("/",verifyToken, createMessage);
+router.get("/",verifyToken, getAllMessages);
+router.get("/between",verifyToken, getAllMessagesBettwenTwoUsers);
+router.get("/:id",verifyToken, getMessageById);
 export default router;

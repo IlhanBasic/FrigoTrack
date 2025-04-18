@@ -146,103 +146,103 @@ export const createPayment = async (req, res) => {
   }
 };
 
-export const updatePayment = async (req, res) => {
-  try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Nevalidan ID format.",
-      });
-    }
+// export const updatePayment = async (req, res) => {
+//   try {
+//     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Nevalidan ID format.",
+//       });
+//     }
 
-    const validationErrors = validatePaymentData(req.body, true);
-    if (validationErrors) {
-      return res.status(400).json({
-        success: false,
-        message: "Neuspešna validacija.",
-        errors: validationErrors,
-      });
-    }
+//     const validationErrors = validatePaymentData(req.body, true);
+//     if (validationErrors) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Neuspešna validacija.",
+//         errors: validationErrors,
+//       });
+//     }
 
-    if (req.body.document) {
-      const document = await Document.findById(req.body.document);
-      if (!document) {
-        return res.status(404).json({
-          success: false,
-          message: "Dokument nije pronađen.",
-        });
-      }
-    }
+//     if (req.body.document) {
+//       const document = await Document.findById(req.body.document);
+//       if (!document) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "Dokument nije pronađen.",
+//         });
+//       }
+//     }
 
-    const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+//     const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, {
+//       new: true,
+//       runValidators: true,
+//     });
 
-    if (!payment) {
-      return res.status(404).json({
-        success: false,
-        message: "Plaćanje nije pronađeno.",
-      });
-    }
+//     if (!payment) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Plaćanje nije pronađeno.",
+//       });
+//     }
 
-    res.status(200).json({
-      success: true,
-      message: "Uspеšno azuriranje plaćanja.",
-      data: payment,
-    });
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).reduce((acc, err) => {
-        acc[err.path] = err.message;
-        return acc;
-      }, {});
-      return res.status(400).json({
-        success: false,
-        message: "Neuspešna validacija.",
-        errors,
-      });
-    }
-    res.status(500).json({
-      success: false,
-      message: "Neuspešno azuriranje plaćanja.",
-      error: error.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       message: "Uspеšno azuriranje plaćanja.",
+//       data: payment,
+//     });
+//   } catch (error) {
+//     if (error.name === "ValidationError") {
+//       const errors = Object.values(error.errors).reduce((acc, err) => {
+//         acc[err.path] = err.message;
+//         return acc;
+//       }, {});
+//       return res.status(400).json({
+//         success: false,
+//         message: "Neuspešna validacija.",
+//         errors,
+//       });
+//     }
+//     res.status(500).json({
+//       success: false,
+//       message: "Neuspešno azuriranje plaćanja.",
+//       error: error.message,
+//     });
+//   }
+// };
 
-export const deletePayment = async (req, res) => {
-  try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Nevalidan ID format.",
-      });
-    }
+// export const deletePayment = async (req, res) => {
+//   try {
+//     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Nevalidan ID format.",
+//       });
+//     }
 
-    const payment = await Payment.findByIdAndDelete(req.params.id);
+//     const payment = await Payment.findByIdAndDelete(req.params.id);
 
-    if (!payment) {
-      return res.status(404).json({
-        success: false,
-        message: "Plaćanje nije pronađeno.",
-      });
-    }
+//     if (!payment) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Plaćanje nije pronađeno.",
+//       });
+//     }
 
-    res.status(200).json({
-      success: true,
-      message: "Uspеšno brisanje plaćanja.",
-      data: {
-        id: payment._id,
-        amount: payment.amountPaid,
-        document: payment.document,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Neuspešno brisanje plaćanja.",
-      error: error.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       message: "Uspеšno brisanje plaćanja.",
+//       data: {
+//         id: payment._id,
+//         amount: payment.amountPaid,
+//         document: payment.document,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Neuspešno brisanje plaćanja.",
+//       error: error.message,
+//     });
+//   }
+// };

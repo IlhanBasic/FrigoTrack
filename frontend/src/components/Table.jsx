@@ -13,9 +13,11 @@ const TABLES = {
   proizvodi: "products",
   dokumenti: "documents",
   placanja: "payments",
-  prostori: "cooldrooms",
+  prostori: "coldrooms",
 };
+import { useSelector } from "react-redux";
 export default function Table({ items, type }) {
+  const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
   const [term, setTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
@@ -177,7 +179,10 @@ export default function Table({ items, type }) {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/${TABLES[type]}/${id}`,
-        { method: "DELETE" }
+        { method: "DELETE", credentials: "include" ,headers:{
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }}
       );
       if (response.ok) {
         window.location.reload();

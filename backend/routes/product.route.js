@@ -1,21 +1,26 @@
-import express from 'express';
+import express from "express";
 import {
-    createProduct,
-    getAllProducts,
-    getProductById,
-    updateProduct,
-    storeProductInColdRoom,
-    deleteProduct,
-    sellingProducts,
-    buyingProducts
-} from '../controllers/product.controller.js';
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  storeProductInColdRoom,
+  deleteProduct,
+  sellingProducts,
+  buyingProducts,
+} from "../controllers/product.controller.js";
+import {
+  verifyAdministration,
+  verifyStock,
+  verifyToken,
+} from "../middleware/auth.middleware.js";
 const router = express.Router();
-router.post('/', createProduct);
-router.post('/store', storeProductInColdRoom);
-router.post('/sell', sellingProducts);
-router.post('/buy', buyingProducts);
-router.get('/', getAllProducts);
-router.get('/:id', getProductById);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
+router.post("/", verifyToken, createProduct);
+router.post("/store", verifyToken, storeProductInColdRoom);
+router.post("/sell", verifyToken, sellingProducts);
+router.post("/buy", verifyToken, buyingProducts);
+router.get("/", verifyToken, getAllProducts);
+router.get("/:id", verifyToken, getProductById);
+router.put("/:id", verifyToken, updateProduct);
+router.delete("/:id", verifyToken, deleteProduct);
 export default router;

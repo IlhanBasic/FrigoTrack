@@ -6,10 +6,11 @@ import {
     updatePartner,
     deletePartner
 } from '../controllers/partner.controller.js';
+import { verifyAdministration, verifyToken } from '../middleware/auth.middleware.js';
 const router = express.Router();
-router.post('/', createPartner);
-router.get('/', getAllPartners);
-router.get('/:id', getPartnerById);
-router.put('/:id', updatePartner);
-router.delete('/:id', deletePartner);
+router.post('/',verifyToken, createPartner);
+router.get('/',verifyToken, getAllPartners);
+router.get('/:id',verifyToken, getPartnerById);
+router.put('/:id',verifyToken, updatePartner);
+router.delete('/:id',verifyToken, deletePartner);
 export default router;

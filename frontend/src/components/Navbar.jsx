@@ -10,7 +10,6 @@ export default function Navbar() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useSelector((state) => state.auth.user);
-
   useEffect(() => {
     function handleResize() {
       setIsSmallScreen(window.innerWidth < 480);
@@ -60,51 +59,66 @@ export default function Navbar() {
               Početna
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/rooms"
-              end
-              onClick={() => isSmallScreen && setIsMenuOpen(false)}
-            >
-              Komore
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/partners"
-              end
-              onClick={() => isSmallScreen && setIsMenuOpen(false)}
-            >
-              Partneri
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/products"
-              end
-              onClick={() => isSmallScreen && setIsMenuOpen(false)}
-            >
-              Proizvodi
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/documents"
-              end
-              onClick={() => isSmallScreen && setIsMenuOpen(false)}
-            >
-              Dokumenta
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/payments"
-              end
-              onClick={() => isSmallScreen && setIsMenuOpen(false)}
-            >
-              Plaćanja
-            </NavLink>
-          </li>
+          {(user.role === "admin" ||
+            (user.role === "user" && user.department === "skladište")) && (
+            <li>
+              <NavLink
+                to="/rooms"
+                end
+                onClick={() => isSmallScreen && setIsMenuOpen(false)}
+              >
+                Komore
+              </NavLink>
+            </li>
+          )}
+          {(user.role === "admin" ||
+            (user.role === "user" && user.department === "administracija")) && (
+            <li>
+              <NavLink
+                to="/partners"
+                end
+                onClick={() => isSmallScreen && setIsMenuOpen(false)}
+              >
+                Partneri
+              </NavLink>
+            </li>
+          )}
+          {(user.role === "admin" ||
+            (user.role === "user" && user.department === "skladište")) && (
+            <li>
+              <NavLink
+                to="/products"
+                end
+                onClick={() => isSmallScreen && setIsMenuOpen(false)}
+              >
+                Proizvodi
+              </NavLink>
+            </li>
+          )}
+          {(user.role === "admin" ||
+            (user.role === "user" && user.department === "administracija")) && (
+            <li>
+              <NavLink
+                to="/documents"
+                end
+                onClick={() => isSmallScreen && setIsMenuOpen(false)}
+              >
+                Dokumenta
+              </NavLink>
+            </li>
+          )}
+          {(user.role === "admin" ||
+            (user.role === "user" && user.department === "administracija")) && (
+            <li>
+              <NavLink
+                to="/payments"
+                end
+                onClick={() => isSmallScreen && setIsMenuOpen(false)}
+              >
+                Plaćanja
+              </NavLink>
+            </li>
+          )}
           <li>
             <NavLink
               to="/stats"

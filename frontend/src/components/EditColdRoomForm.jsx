@@ -2,7 +2,9 @@ import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./form.css";
+import {useSelector} from "react-redux";
 export default function EditColdRoomForm() {
+  const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
   const [selectedColdRoom, setSelectedColdRoom] = useState(null);
   useEffect(() => {
@@ -15,7 +17,13 @@ export default function EditColdRoomForm() {
           return;
         }
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/coldrooms/${id}`
+          `${import.meta.env.VITE_API_URL}/coldrooms/${id}`,{
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
         );
         const data = await res.json();
         setSelectedColdRoom(data.data);
@@ -66,7 +74,9 @@ export default function EditColdRoomForm() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             location,
             temperature,

@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "./form.css";
 import { toast } from "react-toastify";
 import { VARIETY } from "../data/data.js";
+import {useSelector} from "react-redux";
 export default function CreateProductForm() {
+  const token = useSelector((state)=>state.auth.token);
   const [name, setName] = useState("");
   const navigate = useNavigate();
   const [coldRooms, setColdRooms] = useState([]);
@@ -30,7 +32,9 @@ export default function CreateProductForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           name,
           variety,
@@ -57,7 +61,9 @@ export default function CreateProductForm() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
+            credentials: "include",
             body: JSON.stringify({
               productId: data.product._id,
               coldRoomId,
@@ -90,7 +96,13 @@ export default function CreateProductForm() {
     errors: null,
   });
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/coldrooms`)
+    fetch(`${import.meta.env.VITE_API_URL}/coldrooms`,{
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => setColdRooms(data.data));
   }, []);

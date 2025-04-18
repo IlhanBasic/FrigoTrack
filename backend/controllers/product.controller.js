@@ -135,6 +135,7 @@ const validateProductData = (data, isUpdate = false) => {
   return Object.keys(errors).length > 0 ? errors : null;
 };
 
+
 export const getAllProducts = async (req, res) => {
   try {
     const { activeOnly = true } = req.query;
@@ -217,7 +218,6 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    // Provera validnosti ID-a proizvoda
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: "Nevalidan ID proizvoda." });
     }
@@ -230,7 +230,6 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    // Provera da li postoji proizvod sa istim SKU
     if (req.body.sku) {
       const existingProduct = await Product.findOne({
         sku: req.body.sku,
@@ -243,21 +242,17 @@ export const updateProduct = async (req, res) => {
       }
     }
 
-    // Pronađi proizvod koji se ažurira
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: "Proizvod nije pronađen." });
     }
 
-    // Ako je hladnjača promenjena, ukloni proizvod sa stare hladnjače i dodaj na novu
     if (
       req.body.coldRoomId &&
       req.body.coldRoomId !== product.coldRooms[0]?.coldRoom.toString()
     ) {
-      // Konvertuj coldRoomId u ObjectId
       const coldRoomObjectId = mongoose.Types.ObjectId(req.body.coldRoomId);
 
-      // Ukloni proizvod sa stare hladnjače
       await Product.updateOne(
         { _id: req.params.id },
         {
@@ -267,7 +262,6 @@ export const updateProduct = async (req, res) => {
         }
       );
 
-      // Dodaj proizvod na novu hladnjaču
       await Product.updateOne(
         { _id: req.params.id },
         {
@@ -457,3 +451,5 @@ export const buyingProducts = async (req, res) => {
     return res.status(500).json({ message: "Greška na serveru", error: err.message });
   }
 };
+
+

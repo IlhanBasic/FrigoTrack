@@ -3,13 +3,12 @@ import {
     createPayment,
     getAllPayments,
     getPaymentById,
-    updatePayment,
-    deletePayment
+    // updatePayment,
+    // deletePayment
 } from '../controllers/payment.controller.js';
+import { verifyAdministration, verifyToken } from '../middleware/auth.middleware.js';
 const router = express.Router();
-router.post('/', createPayment);
-router.get('/', getAllPayments);
-router.get('/:id', getPaymentById);
-router.put('/:id', updatePayment);
-router.delete('/:id', deletePayment);
+router.post('/',verifyToken, createPayment);
+router.get('/',verifyToken, getAllPayments);
+router.get('/:id',verifyToken, getPaymentById);
 export default router;

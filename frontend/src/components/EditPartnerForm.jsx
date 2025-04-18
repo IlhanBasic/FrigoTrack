@@ -2,7 +2,9 @@ import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./form.css";
+import { useSelector } from "react-redux";
 export default function EditPartnerForm() {
+  const token = useSelector((state)=>state.auth.token);
   const navigate = useNavigate();
   const [partner, setPartner] = useState(null);
   useEffect(() => {
@@ -16,7 +18,13 @@ export default function EditPartnerForm() {
           return;
         }
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/partners/${id}`
+          `${import.meta.env.VITE_API_URL}/partners/${id}`,{
+            headers:{
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
         );
         const data = await res.json();
         setPartner(data);
@@ -35,8 +43,9 @@ export default function EditPartnerForm() {
     const accountNumber = formData.get("accountNumber")?.trim();
     const bankName = formData.get("bankName")?.trim();
     const type = formData.get("type")?.trim();
-    const isActive = formData.get("isActive") === "true";
-
+    const isActive = formData.get("isActive") === "on";
+    const isVATRegistered = formData.get("isVATRegistered") === "on";
+    
     const errors = [];
 
     if (!name || !address || !phone || !pibOrJmbg || !type) {
@@ -71,7 +80,9 @@ export default function EditPartnerForm() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             name,
             address,
@@ -82,6 +93,7 @@ export default function EditPartnerForm() {
             bankName,
             type,
             isActive,
+            isVATRegistered
           }),
         }
       );

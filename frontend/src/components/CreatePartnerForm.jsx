@@ -1,9 +1,11 @@
 import { useActionState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./form.css";
-import {toast} from 'react-toastify';
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 export default function CreatePartnerForm() {
   const navigate = useNavigate();
+  const token = useSelector((state) => state.auth.token);
   async function createPartnerAction(prevFormState, formData) {
     const name = formData.get("name")?.trim();
     const address = formData.get("address")?.trim();
@@ -13,7 +15,9 @@ export default function CreatePartnerForm() {
     const accountNumber = formData.get("accountNumber")?.trim();
     const bankName = formData.get("bankName")?.trim();
     const type = formData.get("type")?.trim();
-
+    const isActive = formData.get("isActive") === "on";
+    const isVATRegistered = formData.get("isVATRegistered") === "on";
+    
     const errors = [];
 
     if (!name || !address || !phone || !pibOrJmbg || !type) {
@@ -55,13 +59,17 @@ export default function CreatePartnerForm() {
       accountNumber,
       bankName,
       type,
+      isActive,
+      isVATRegistered
     };
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/partners`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(partner),
       });
       if (!response.ok) {

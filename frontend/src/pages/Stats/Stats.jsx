@@ -23,7 +23,7 @@ import {
   Award,
 } from "lucide-react";
 import "./stats.css";
-
+import {useSelector} from "react-redux";
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const SalesCharts = ({ documents }) => {
@@ -121,13 +121,19 @@ const SalesCharts = ({ documents }) => {
 };
 
 export default function Stats() {
+  const token = useSelector((state) => state.auth.token);
   const [partners, setPartners] = useState([]);
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   useEffect(() => {
     async function fetchPartners() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/partners`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/partners`, {
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
         setPartners(data);
@@ -138,7 +144,12 @@ export default function Stats() {
 
     async function fetchOrders() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/documents`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/documents`, {
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
         setOrders(data.data);
@@ -148,7 +159,12 @@ export default function Stats() {
     }
     async function fetchProducts() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/products`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/products`, {
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
         setProducts(data);
@@ -201,7 +217,7 @@ export default function Stats() {
       name: `${product.name} - ${product.variety}`,
       quantity: totalQuantity,
       revenue: totalRevenue,
-      year:product.harvestYear
+      year: product.harvestYear,
     };
   });
 
@@ -297,7 +313,9 @@ export default function Stats() {
                   <Package size={20} />
                 </div>
                 <div className="top-item-info">
-                  <h4>{product.name} ({product.year})</h4>
+                  <h4>
+                    {product.name} ({product.year})
+                  </h4>
                   <p>
                     {(product.quantity / 1000.0).toFixed(2)} T |{" "}
                     {new Intl.NumberFormat("sr-RS", {

@@ -8,6 +8,7 @@ import Loader from "./Loader";
 
 export default function EditDocumentForm() {
   const navigate = useNavigate();
+  const token = useSelector((state)=> state.auth.token);
   const user = useSelector((state) => state.auth.user);
   const [initStatus, setInitStatus] = useState("");
   const [selectedVariety, setSelectedVariety] = useState("");
@@ -31,9 +32,27 @@ export default function EditDocumentForm() {
         }
 
         const [documentRes, productsRes, partnersRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/documents/${id}`),
-          fetch(`${import.meta.env.VITE_API_URL}/products`),
-          fetch(`${import.meta.env.VITE_API_URL}/partners`),
+          fetch(`${import.meta.env.VITE_API_URL}/documents/${id}`,{
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/products`,{
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/partners`,{
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }),
         ]);
 
         const [documentData, productsData, partnersData] = await Promise.all([
@@ -146,7 +165,9 @@ export default function EditDocumentForm() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
+            credentials: "include",
             body: JSON.stringify({
               documentId: document._id,
               items: document.items.map((item) => ({
@@ -171,7 +192,9 @@ export default function EditDocumentForm() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
+            credentials: "include",
             body: JSON.stringify({
               documentId: document._id,
               items: document.items.map((item) => ({
@@ -194,7 +217,9 @@ export default function EditDocumentForm() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             type: document.type,
             date: document.date,

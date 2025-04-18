@@ -40,7 +40,7 @@
   color: var(--button-color);
 }
 
-form {
+.register-container form {
   background-color: var(--form-bg);
   padding: 2.5rem;
   border-radius: 20px;
@@ -52,13 +52,13 @@ form {
   gap: 1.5rem;
 }
 
-.input-group {
+.register-container form .input-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.input-group label {
+.register-container form .input-group label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -66,12 +66,12 @@ form {
   font-weight: 500;
 }
 
-.input-group label svg {
+.register-container form .input-group label svg {
   color: var(--text-secondary);
 }
 
-.input-group input,
-.input-group select {
+.register-container form .input-group input,
+.register-container form .input-group select {
   padding: 0.8rem 1rem;
   border: 2px solid var(--input-border);
   border-radius: 12px;
@@ -80,18 +80,18 @@ form {
   background-color: white;
 }
 
-.input-group input:focus,
-.input-group select:focus {
+.register-container form .input-group input:focus,
+.register-container form .input-group select:focus {
   outline: none;
   border-color: var(--input-focus);
   box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
-.input-group input::placeholder {
+.register-container form .input-group input::placeholder {
   color: #999;
 }
 
-button {
+.register-container form button {
   background-color: var(--button-color);
   color: var(--text-primary);
   border: none;
@@ -104,14 +104,14 @@ button {
   margin-top: 1rem;
 }
 
-button:hover {
+.register-container form button:hover {
   background-color: var(--button-hover);
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
 }
 
-.errors {
+.register-container form .errors {
   list-style: none;
   padding: 0.75rem 1rem;
   margin: 0;
@@ -120,7 +120,7 @@ button:hover {
   border-left: 4px solid var(--error-color);
 }
 
-.errors li {
+.register-container form .errors li {
   color: var(--error-color);
   font-size: 0.9rem;
   font-weight: 500;
@@ -132,27 +132,27 @@ button:hover {
     padding: 1rem;
   }
 
-  form {
+  .register-container form {
     padding: 1.5rem;
   }
 
-  .logo-container h1 {
+  .register-container .logo-container h1 {
     font-size: 2rem;
   }
 
-  .input-group input,
-  .input-group select,
-  button {
+  .register-container form .input-group input,
+  .register-container form .input-group select,
+  .register-container form button {
     padding: 0.7rem;
   }
 }
 
 @media (max-width: 480px) {
-  .logo-container h1 {
+  .register-container .logo-container h1 {
     font-size: 1.75rem;
   }
 
-  form {
+  .register-container form {
     padding: 1.25rem;
   }
 }

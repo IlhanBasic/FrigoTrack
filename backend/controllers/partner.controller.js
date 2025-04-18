@@ -22,14 +22,14 @@ export const getPartnerById = async (req, res) => {
 };
 
 export const createPartner = async (req, res) => {
-  const { name, address, phone, pibOrJmbg, type } = req.body;
+  const { name, address, phone, pibOrJmbg, type, isVATRegistered, isActive, accountNumber, bankName,email } = req.body;
 
-  if (!name || !address || !phone || !pibOrJmbg || !type) {
+  if (!name || !address || !phone || !pibOrJmbg || !type || !accountNumber || !bankName || !email) {
     return res
       .status(400)
       .json({
         message:
-          "Nedostaju neka polja: name, address, phone, pibOrJmbg, type.",
+          "Nedostaju neka polja: name, address, phone, pibOrJmbg, type,email,bankName,accountNumber.",
       });
   }
 

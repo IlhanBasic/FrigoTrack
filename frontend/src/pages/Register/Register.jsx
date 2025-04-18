@@ -1,18 +1,18 @@
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store/auth-slice.js";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./register.css";
 import logoImg from "../../assets/logo.png";
 const apiUrl = import.meta.env.VITE_API_URL;
 const ROLES = ["admin", "user"];
-const DEPARTMENTS = ["administracija", "prodaja", "skladište",undefined];
-
+const DEPARTMENTS = ["administracija", "prodaja", "skladište", undefined];
+import { useSelector } from "react-redux";
 export default function Register() {
+  const navigate = useNavigate();
   const [isAdminRole, setIsAdminRole] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   async function registerAction(prevFormState, formData) {
     const username = formData.get("username");
@@ -41,12 +41,6 @@ export default function Register() {
 
     if (!ROLES.includes(role)) {
       errors.push("Uloga mora biti admin ili user");
-    }
-
-    if (!DEPARTMENTS.includes(department)) {
-      errors.push(
-        "Departman mora biti administracija ili prodaja ili skladište"
-      );
     }
 
     if (password.length < 6) {

@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./form.css";
 import { VARIETY } from "../data/data";
+import { useSelector } from "react-redux";
 export default function EditPartnerForm() {
+  const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
   const [coldRooms, setColdRooms] = useState([]);
   const [product, setProduct] = useState(null);
@@ -17,7 +19,14 @@ export default function EditPartnerForm() {
           return;
         }
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/products/${id}`
+          `${import.meta.env.VITE_API_URL}/products/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
         );
         const data = await res.json();
         setProduct(data);
@@ -28,7 +37,13 @@ export default function EditPartnerForm() {
     fetchProduct();
   }, []);
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/coldrooms`)
+    fetch(`${import.meta.env.VITE_API_URL}/coldrooms`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => setColdRooms(data.data));
   }, []);
@@ -53,7 +68,9 @@ export default function EditPartnerForm() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             purchasePrice,
             sellingPrice,
@@ -70,9 +87,8 @@ export default function EditPartnerForm() {
           }),
         }
       );
-
       const responseData = await response.json();
-
+      console.log(responseData);
       if (response.ok) {
         toast.success("Proizvod uspješno izmenjen!");
         navigate("/products");
@@ -156,9 +172,12 @@ export default function EditPartnerForm() {
             id="coldRoomId"
             name="coldRoomId"
             required
-            value={product?.coldRoomId}
+            value={product?.coldRooms[0]?.coldRoom || ""}
             onChange={(e) =>
-              setProduct({ ...product, coldRoomId: e.target.value })
+              setProduct({
+                ...product,
+                coldRooms: [{ coldRoom: e.target.value }],
+              })
             }
           >
             {coldRooms.map((room) => (

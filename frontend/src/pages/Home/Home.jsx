@@ -15,6 +15,7 @@ import {
 
 
 export default function Home() {
+  const token = useSelector((state)=>state.auth.token);
   const [selectedProduct, setSelectedProduct] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [products, setProducts] = useState([]);
@@ -27,7 +28,12 @@ export default function Home() {
     async function fetchProducts() {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/products`
+          `${import.meta.env.VITE_API_URL}/products`,{
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
         const data = await response.json();
         if (!response.ok) throw new Error(data.message);
@@ -41,7 +47,12 @@ export default function Home() {
     async function fetchOrders() {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/documents`
+          `${import.meta.env.VITE_API_URL}/documents`,{
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
         const data = await response.json();
         if (!response.ok) throw new Error(data.message);
@@ -54,7 +65,12 @@ export default function Home() {
     async function fetchColdRooms() {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/coldrooms`
+          `${import.meta.env.VITE_API_URL}/coldrooms`,{
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
         const data = await response.json();
         if (!response.ok) throw new Error(data.message);
