@@ -9,18 +9,18 @@ import {
   getLoggedInUser,
   deleteAllUser,
   logoutUser,
-  getUserByUsername
+  getUserByUsername,
 } from "../controllers/user.controller.js";
 import { verifyAdmin, verifyToken } from "../middleware/auth.middleware.js";
 const router = express.Router();
 router.get("/me", getLoggedInUser);
-router.get("/logout", logoutUser);
-router.post("/register", createUser);
+router.get("/logout", verifyToken, logoutUser);
+router.post("/register", verifyToken, verifyAdmin, createUser);
 router.post("/login", loginUser);
-router.get("/", getAllUsers);
+router.get("/", verifyToken, getAllUsers);
 router.get("/:username", verifyToken, getUserByUsername);
 router.get("/:id", verifyToken, getUserById);
-router.put("/:id", verifyToken, updateUser);
-router.delete("/:id",verifyAdmin, deleteUser);
-router.delete("/",verifyAdmin, deleteAllUser);
+router.put("/:id", verifyToken, verifyAdmin, updateUser);
+router.delete("/:id", verifyAdmin, verifyAdmin, deleteUser);
+router.delete("/", verifyAdmin, verifyAdmin, deleteAllUser);
 export default router;

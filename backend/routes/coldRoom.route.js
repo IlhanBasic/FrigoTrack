@@ -8,9 +8,10 @@ import {
 } from '../controllers/coldRoom.controller.js';
 import { verifyStock, verifyToken } from '../middleware/auth.middleware.js';
 const router = express.Router();
-router.post('/',verifyToken, createColdRoom);
-router.get('/',verifyToken, getAllColdRooms);
-router.get('/:id',verifyToken, getColdRoomById);
-router.put('/:id',verifyToken, updateColdRoom);
-router.delete('/:id',verifyToken, deleteColdRoom);
+router.post('/', verifyToken, verifyStock, createColdRoom);
+router.get('/', verifyToken, getAllColdRooms);
+router.get('/:id', verifyToken, getColdRoomById);
+router.put('/:id', verifyToken, verifyStock, updateColdRoom);
+router.delete('/:id', verifyToken, verifyStock, deleteColdRoom);
+
 export default router;

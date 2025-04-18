@@ -8,9 +8,9 @@ import {
 } from '../controllers/partner.controller.js';
 import { verifyAdministration, verifyToken } from '../middleware/auth.middleware.js';
 const router = express.Router();
-router.post('/',verifyToken, createPartner);
+router.post('/',verifyToken,verifyAdministration, createPartner);
 router.get('/',verifyToken, getAllPartners);
 router.get('/:id',verifyToken, getPartnerById);
-router.put('/:id',verifyToken, updatePartner);
-router.delete('/:id',verifyToken, deletePartner);
+router.put('/:id',verifyToken,verifyAdministration, updatePartner);
+router.delete('/:id',verifyToken,verifyAdministration, deletePartner);
 export default router;

@@ -20,13 +20,17 @@ const verifyAdministration = (req, res, next) => {
 };
 
 const verifyStock = (req, res, next) => {
-  if ((req.user.role !== "user" || req.user.role !== "admin") && (req.user.department !== "skladište" || req.user.department !== undefined)) {
+  if (
+    req.user.role !== "admin" &&
+    !(req.user.role === "user" && req.user.department === "skladište")
+  ) {
     return res
       .status(403)
       .json({ message: "Pristup odbijen, admin ili magacioner uloga potrebna." });
   }
   next();
-}
+};
+
 const verifyToken = (req, res, next) => {
   let token =
     req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
