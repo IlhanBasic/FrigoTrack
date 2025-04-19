@@ -43,7 +43,7 @@ Used for tracking fruit inventory, transactions, and document generation (PDF/Ex
 ## 🔧 Installation
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/FrigoTrack.git
+git clone https://github.com/IlhanBasic/FrigoTrack.git
 cd FrigoTrack
 ```
 2. Set up backend:
@@ -102,3 +102,18 @@ npm run dev
 |-----------|--------|----------|
 | ![Assistant](https://firebasestorage.googleapis.com/v0/b/rentorabackendimages.appspot.com/o/frigotrack%2Fassistent.png?alt=media&token=a9eced62-e7ce-4ee3-822f-683382848532) | ![Login](https://firebasestorage.googleapis.com/v0/b/rentorabackendimages.appspot.com/o/frigotrack%2Flogin.png?alt=media&token=97cae093-c766-4fc4-be6f-408bb03a5c8a) | ![Register](https://firebasestorage.googleapis.com/v0/b/rentorabackendimages.appspot.com/o/frigotrack%2Fregister.png?alt=media&token=df1d2724-3e8e-4ba5-8a3d-f1d5cccce5c3) |
 | *Assistant* | *Login* | *Register* |
+## 📄 Required Environment Variables
+Feel free to use and modify this project! Below are the required .env files for each part of the application.
+Frontend:
+```env
+VITE_API_URL=https://frigotrack-backend.onrender.com/api
+VITE_GITHUB_TOKEN=your
+VITE_API_ENDPOINT=your
+```
+Backend:
+```env
+MONGO_URI=your
+JWT_SECRET=your
+PORT=5000
+NODE_ENV=production
+```
