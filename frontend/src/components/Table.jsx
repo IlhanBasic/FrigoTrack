@@ -304,7 +304,7 @@ export default function Table({ items, type }) {
                             minute: "2-digit",
                             second: "2-digit",
                           }).format(new Date(item[key]))
-                        : key === "isActive" || key === "isPaid"
+                        : key === "isActive" || key === "isPaid" || key === "isVATRegistered"
                         ? item[key]
                           ? "DA"
                           : "NE"

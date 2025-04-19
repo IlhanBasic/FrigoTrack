@@ -63,7 +63,6 @@ export default function Login() {
           token: data.token,
         })
       );
-  
       toast.success("Uspešna prijava!");
       navigate("/");
   

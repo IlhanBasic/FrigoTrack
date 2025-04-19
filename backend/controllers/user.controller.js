@@ -100,10 +100,11 @@
 
       res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-        maxAge: 60 * 60 * 1000, // 1 hour
+        secure: true,
+        sameSite: "None",
+        maxAge: 60 * 60 * 1000,
       });
+      
 
       res.status(200).json({
         message: "Login uspešan.",

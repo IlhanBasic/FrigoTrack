@@ -10,6 +10,7 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import { useSelector } from "react-redux";
+import './assistant.css'
 // Učitaj token iz env promenljive
 const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
 const API_ENDPOINT = "https://models.inference.ai.azure.com";
@@ -101,7 +102,7 @@ function ChatComponent() {
   }
 
   return (
-    <div style={{ position: "relative", height: "85vh" }}>
+    <div className="assistant-container">
       <MainContainer>
         <ChatContainer>
           <MessageList

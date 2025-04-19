@@ -1,0 +1,21 @@
+.assistant-container {
+  position: relative;
+  height: 90vh;
+  padding: 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+@media (max-width: 768px) {
+  .assistant-container {
+    height: 80vh;
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .assistant-container {
+    height: 70vh;
+    padding: 0.25rem;
+  }
+}

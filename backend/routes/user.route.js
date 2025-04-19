@@ -17,7 +17,7 @@ router.get("/me", getLoggedInUser);
 router.get("/logout", verifyToken, logoutUser);
 router.post("/register", verifyToken, verifyAdmin, createUser);
 router.post("/login", loginUser);
-router.get("/", verifyToken, getAllUsers);
+router.get("/",verifyToken, getAllUsers);
 router.get("/:username", verifyToken, getUserByUsername);
 router.get("/:id", verifyToken, getUserById);
 router.put("/:id", verifyToken, verifyAdmin, updateUser);

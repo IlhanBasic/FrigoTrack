@@ -21,7 +21,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   path: "/socket.io",
   cors: {
-    origin: "https://frigotrack.onrender.com/",
+    origin: ["https://frigotrack.onrender.com", "http://localhost:5173"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -31,7 +31,7 @@ const io = new Server(httpServer, {
 app.use(cookies());
 app.use(
   cors({
-    origin: "https://frigotrack.onrender.com/",
+    origin: ["https://frigotrack.onrender.com","http://localhost:5173"],
     credentials: true,
   })
 );
